@@ -1,0 +1,62 @@
+{
+  "Actions": [
+    {
+      "Icon": "pluginIcon", 
+      "Name": "OpenHAB Switch", 
+      "States": [
+        {
+          "Image": "icons/switch_off",
+          "TitleAlignment": "middle", 
+          "FontSize": "16"
+        },
+        {
+          "Image": "icons/switch_on",
+          "TitleAlignment": "middle", 
+          "FontSize": "16"
+        }
+      ],
+      "PropertyInspectorPath": "openhabSwitch_PI.html", 
+      "SupportedInMultiActions": true,
+      "Tooltip": "How many times did you get pwned today? Keep track with this counter.", 
+      "UUID": "com.temp.openhab"
+    },
+    {
+      "Icon": "pluginIcon", 
+      "Name": "Openhab2", 
+      "States": [
+        {
+          "Image": "pluginIcon",
+          "TitleAlignment": "middle", 
+          "FontSize": "16"
+        }
+      ], 
+      "SupportedInMultiActions": true,
+      "Tooltip": "How many times did you get pwned today? Keep track with this counter.", 
+      "UUID": "com.temp.openhab2"
+    }
+  ], 
+  "SDKVersion": 2,
+  "Author": "Elgato", 
+  "CodePath": "code.html", 
+  "Description": "Track the number of times you press a key.", 
+  "Name": "Counter", 
+  "Icon": "pluginIcon", 
+  "URL": "https://www.elgato.com/gaming/stream-deck", 
+  "Version": "1.4",
+  "Category": "OpenHAB",
+  "CategoryIcon": "pluginIcon",
+  "OS": [
+    {
+        "Platform": "mac", 
+        "MinimumVersion" : "10.11"
+    },
+    {
+        "Platform": "windows", 
+        "MinimumVersion" : "10"
+    }
+  ],
+  "Software": 
+    {
+        "MinimumVersion" : "4.1"
+    }
+}

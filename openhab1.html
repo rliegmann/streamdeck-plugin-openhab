@@ -1,0 +1,116 @@
+<head>
+    <meta charset="utf-8" />
+    <title>My Property Inspector</title>
+    <link rel="stylesheet" href="sdpi.css">
+</head>
+
+<script>
+    document.addEventListener("load", onLoad);
+
+        // this is our global websocket, used to communicate from/to Stream Deck software
+        // and some info about our plugin, as sent by Stream Deck software
+        var websocket = null,
+        uuid = null,
+        actionInfo = {};
+
+        function connectElgatoStreamDeckSocket(inPort, inUUID, inRegisterEvent, inInfo, inActionInfo) {
+            uuid = inUUID;
+            console.log(uuid);
+            // please note: the incoming arguments are of type STRING, so
+            // in case of the inActionInfo, we must parse it into JSON first
+            actionInfo = JSON.parse(inActionInfo); // cache the info
+            websocket = new WebSocket('ws://localhost:' + inPort);
+
+            // if connection was established, the websocket sends
+            // an 'onopen' event, where we need to register our PI
+            websocket.onopen = function () {
+                var json = {
+                    event:  inRegisterEvent,
+                    uuid:   inUUID
+                };
+                // register property inspector to Stream Deck
+                websocket.send(JSON.stringify(json));
+            }
+
+            websocket.onmessage = function (evt) {
+            var jsonObj = JSON.parse(evt.data);
+            var event = jsonObj["event"];
+            console.log(jsonObj);
+            if (event == "sendToPropertyInspector") {
+            var value = jsonObj.payload;
+            setDomElements(value);
+            }
+        };
+        }
+
+        // our method to pass values to the plugin
+        function sendValueToPlugin(value, param) {
+            if (websocket) {
+                const json = {
+                        "action": actionInfo['action'],
+                        "event": "sendToPlugin",
+                        "context": uuid,
+                        "payload": {
+                            [param] : value
+                        }
+                 };
+                 websocket.send(JSON.stringify(json));
+            }
+        }
+
+        function setDomElements(value) {
+            document.getElementById("myIdentifier").value = value.myIdentifier;
+            //document.getElementById("itemName").value = value.itemName;
+        }
+
+    function onLoad() {
+        document.getElementById("openhabServer_Input").value = "Iframe is loaded.";
+        fetch('http://192.168.178.211:8080/rest/items?type=Switch&recursive=false')
+        .then(
+            function(response) {
+            if (response.status !== 200) {
+                console.log('Looks like there was a problem. Status Code: ' +
+                response.status);
+                return;
+            }
+
+            // Examine the text in the response
+            response.json().then(function(data) {
+                console.log(data);
+                var select = document.getElementById("select");
+                data.forEach(function(entry) {
+                    console.log(entry);
+                    var opt = document.createElement('option');
+                    opt.value = entry["name"];
+                    opt.innerHTML = entry["name"];
+                    select.appendChild(opt);
+                });
+            });
+            }
+        )
+        .catch(function(err) {
+            console.log('Fetch Error :-S', err);
+        });
+    }
+
+</script>
+
+<body>
+    <div class="sdpi-wrapper">
+
+        <div class="sdpi-item" id="openhab_server">
+            <div class="sdpi-item-label">OpenHAB Server</div> 
+            <input onchange="sendValueToPlugin(event.target.value, 'myIdentifier')" class="sdpi-item-value" type="text" id="myIdentifier" value="">
+        </div>        
+        
+                
+
+        <div class="sdpi-item" id="select_single">
+            <div class="sdpi-item-label">Select</div> 
+            <select class="sdpi-item-value select" id="select" style="width: 170px">
+            </select> 
+            <button onclick="onLoad()" class="sdpi-item-value" value="Click Me only">Refresh</button>
+       </div>
+
+    <div>
+</body>

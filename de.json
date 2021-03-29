@@ -1,0 +1,8 @@
+{
+  "Description": "Openhab Connector", 
+  "Name": "OpenHAB", 
+  "com.temp.openhab.action": {
+    "Name": "OpenHAB", 
+    "Tooltip": "Connector"
+  }
+}

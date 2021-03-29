@@ -1,0 +1,21 @@
+<script src="js/openHabConnector.js"></script>
+
+<script>
+    function onButtonClick() {
+        var connector = new OpenHabConnector("http://192.168.178.211:8080");
+        connector.on('testEvent', handleMyEvent);
+
+        connector.AddItemListener("HMSchreibtischHMPB2WM552OEQ0902101_1_PressShort");
+        connector.GetAvailableItems("Switch")
+        .then(function(data) {
+            alert(data[0].name);
+        });
+    }
+
+    function handleMyEvent(e) {
+        console.log(e);
+    }
+
+</script>
+
+<button onclick="onButtonClick()" class="sdpi-item-value" value="Click Me only">Refresh</button>
