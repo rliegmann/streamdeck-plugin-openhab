@@ -1,5 +1,26 @@
+const ITEM_TYPE = { 
+    NONE: 0,
+    SWITCH: 1
+};
+
+const SWITCH_STATE = {
+    OFF: "OFF",
+    ON: "ON"
+}
+
+class OpenHabConnectorItemChangedEvent {
+    constructor (itemType = ITEM_TYPE, type, value, oldType, oldValue) {
+        this.ItemType = itemType;
+        this.type = type,
+        this.value = value;
+        this.oldType = oldType;
+        this.oldValue = oldValue;
+    }
+}
+
 class OpenHabConnector {
     openHabEventSource = null;
+    itemType = null;
 
     constructor (baseUrl, context) {
         this.server = baseUrl;
@@ -15,6 +36,8 @@ class OpenHabConnector {
         if (this.openHabEventSource != null) {
             this.openHabEventSource.close();
         }
+
+        this.item = item;
         this.openHabEventSource = new EventSource(this.baseUrl + "events?topics=smarthome/items/" + item + "/statechanged", { withCredentials: false } );
         console.log( this.openHabEventSource.withCredentials);
         console.log( this.openHabEventSource.readyState);
@@ -45,6 +68,16 @@ class OpenHabConnector {
         this._events[name].push(listener);
     }
 
+    removeListener(name, listenerToRemove) {
+        if (!this._events[name]) {
+          throw new Error(`Can't remove a listener. Event "${name}" doesn't exits.`);
+        }
+    
+        const filterListeners = (listener) => listener !== listenerToRemove;
+    
+        this._events[name] = this._events[name].filter(filterListeners);
+      }
+
     emit(name, data) {
         if (!this._events[name]) {
           throw new Error(`Can't emit an event. Event "${name}" doesn't exits.`);
@@ -52,7 +85,22 @@ class OpenHabConnector {
     
         const fireCallbacks = (callback) => {
             var obj = JSON.parse(data);
-          callback(this.context, obj);
+            var payload = JSON.parse(obj.payload);
+            var outData = null;
+            switch (payload.type) {
+                case "OnOff":
+                    if(payload.value == "ON") {
+                        this.itemState = SWITCH_STATE.ON;
+                    } else if (payload.value == "OFF") {
+                        this.itemState = SWITCH_STATE.OFF;
+                    }
+                    var outData = new OpenHabConnectorItemChangedEvent(ITEM_TYPE.SWITCH, payload.type, payload.value, payload.oldType, payload.oldValue);
+                    break;            
+                default:
+                    return;
+            }
+            
+          callback(this.context, outData);
         };
     
         this._events[name].forEach(fireCallbacks);
@@ -66,7 +114,14 @@ class OpenHabConnector {
         return this.server;
     }
 
-    GetAvailableItems(itemType) {
+    Item() { return this.item; }
+
+    ItemState() {       
+        return this.itemState;
+     }
+
+    GetAvailableItems(itemType = ITEM_TYPE) {
+        var itemType = ConvertItemTypeToString(itemType);
         return new Promise((resolve, reject) => {
             let image;  
             fetch(this.baseUrl + "items?type="+itemType+"&recursive=false")
@@ -90,8 +145,12 @@ class OpenHabConnector {
     async GetCurrentStatus(item) {
         const response = await fetch(this.baseUrl + "items/" + item)
         const movies = await response.json();
-
-        this.itemState = movies.state;
+        
+        if(movies.state == "ON") {
+            this.itemState = SWITCH_STATE.ON;
+        } else if (movies.state == "OFF") {
+            this.itemState = SWITCH_STATE.OFF;
+        }
         return movies;
         /*
             .then(function(response) {
@@ -106,11 +165,11 @@ class OpenHabConnector {
             */
     }
 
-    SendCommandToItem(item) {
+    SendCommandToItem(command = SWITCH_STATE) {
         return new Promise((resolve, reject) => {
-            fetch(this.baseUrl + "items/" + item, {
+            fetch(this.baseUrl + "items/" + this.item, {
                 method: 'post',                
-                body: "OFF"
+                body: command
             })
             .then(function(response) {
                 console.log(response);
@@ -120,6 +179,19 @@ class OpenHabConnector {
     }
 
 };
+
+
+
+function ConvertItemTypeToString (itemType = ITEM_TYPE) {
+    switch (itemType) {
+        case ITEM_TYPE.NONE:    
+        	return "none";
+        case ITEM_TYPE.SWITCH:
+            return "Switch";                
+        default:
+            return "none";            ;
+    }
+}
 
 async function getUserAsync(name) 
 {

@@ -42,16 +42,19 @@
             websocket.send(JSON.stringify(json));
             
             OpenhabItemHelper = true;
-            getAvailableItems();
-            requestSettings();
+
+            //SetSettings();
+            //getAvailableItems();
+            //requestSettings();
             
         }
+        
 
         websocket.onmessage = function (evt) {
             var jsonObj = JSON.parse(evt.data);
             var event = jsonObj["event"];
             var payload = jsonObj["payload"];
-            // console.log(jsonObj);
+            console.log(jsonObj);
             if (event == "sendToPropertyInspector") {
                 switch(payload.type) {
                     case "getAvailableItemsResponse":
@@ -59,6 +62,11 @@
 
                         var select = document.getElementById("openhab_item");
                         removeOptions(select);
+
+                        var opt = document.createElement('option');
+                        opt.value = "---";
+                        opt.innerHTML = "---";
+                        select.appendChild(opt);
 
                         if(payload.failed) {
                             var opt = document.createElement('option');
@@ -206,13 +214,19 @@
         });
     }
     
-    function sendValueToPlugin(value, param) {
+    function SendINIT () {
+        let payload = {};
+        payload.type = "init";
+        sendValueToPlugin(payload);
+    }
+
+    function sendValueToPlugin(payload) {
         if (websocket) {
             const json = {
             action: actionInfo["action"],
             event: "sendToPlugin",
             context: uuid,
-            payload: { [param]: value },
+            payload: payload,
             };
         websocket.send(JSON.stringify(json));
         }
@@ -225,11 +239,13 @@
         newSettings.openhab_server = document.getElementById("openhab_server").value;
         newSettings.openhab_item = yourSelect.options[ yourSelect.selectedIndex ].value;
 
-            console.log(OpenhabItemHelper);
+        /*
+        console.log(OpenhabItemHelper);
         if (OpenhabItemHelper) {
             console.log("LOOOOOOOOOOL");
             newSettings.openhab_item = OpenhabItemHelerLastSelect
-        }        
+        }      
+        */  
 
         if (websocket) {
             let payload = {};
@@ -266,7 +282,7 @@
 
         <div class="sdpi-item">
             <div class="sdpi-item-label">OpenHAB Server</div> 
-            <input onchange="openhabServer_onChange(event.target.value, 'openhab_server')" class="sdpi-item-value" type="text" id="openhab_server" value="">
+            <input onchange="openhabServer_onChange(event.target.value, 'openhab_server')" class="sdpi-item-value" type="text" id="openhab_server" value="http://openhab:8080">
         </div>        
         
                 
@@ -274,6 +290,7 @@
         <div class="sdpi-item" id="select_single">
             <div class="sdpi-item-label">Item</div> 
             <select class="sdpi-item-value select" onchange="openhabItem_onSelect(event.target.value, 'openhab_item')" id="openhab_item" style="width: 170px">
+                <option selected="selected" value="---">---</option>
             </select> 
             <button onclick="onButtonRefreshItems()" class="sdpi-item-value max10" value="Click Me only">&#8635;</button>
        </div>

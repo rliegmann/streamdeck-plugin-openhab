@@ -9,7 +9,7 @@
 <script src="js/openHabConnector.js"></script>
 
 <body>
-    <script>
+    <script>	
     	
     	var websocket = null;
 		var pluginUUID = null;
@@ -41,7 +41,7 @@
                },1500);
 			},
 			
-			onKeyUp : function(context, settings, coordinates, userDesiredState) {
+			onKeyUp : function(action, context, settings, coordinates, userDesiredState) {
 				
 				
                 clearTimeout(timer);
@@ -62,13 +62,30 @@
 				*/context
 
 				var connector = openHabConnectors[context];
-				connector.SendCommandToItem(settingsCache[context].openhab_item);
+				var sendCommand = null;
+
+				switch (action) {
+					case "com.temp.openhab":
+						if (connector.ItemState() == SWITCH_STATE.OFF) {
+							sendCommand = SWITCH_STATE.ON;
+						} else if (connector.ItemState() == SWITCH_STATE. ON) {
+							sendCommand = SWITCH_STATE.OFF;
+						}
+						break;
+					default:
+						return;
+				}
+				connector.SendCommandToItem(sendCommand);
 			},
 			
-			onWillAppear : function(context, settings, coordinates) {
+			onWillAppear : function(action, context, settings, coordinates) {
 				
 				settingsCache[context] = { openhab_server: initConfig.openhab_server,
 											openhab_item: initConfig.openhab_item}; //Deep copy!
+				if (Object.keys(settings).length === 0) {
+					console.log("Init Plugin")
+					//return;
+				}
 				
 								
 				if(settings.hasOwnProperty('openhab_server')) {
@@ -84,7 +101,10 @@
 				console.log("onWillApper openhab_server: " + settingsCache[context].openhab_server);
 				console.log("onWillApper openhab_item: " + settingsCache[context].openhab_item);
 				
-				ConnectOpenHab(context);
+				ConnectOpenHab(action, context);
+				counterAction.SendSettings(action, context);
+				
+				
 			},
 
 			onSetSettings: function (context, jsonPayload) {
@@ -183,7 +203,7 @@
 
 				var connector = openHabConnectors[context];
 
-				connector.GetAvailableItems("Switch")
+				connector.GetAvailableItems(ITEM_TYPE.SWITCH)
 				.then(function(data) {
 					data.forEach(function(entry) {
 						//payload.data = {name: entry["name"]};
@@ -214,32 +234,55 @@
 			}			
 		};
 
-		async function ConnectOpenHab (context) {
-				var connector = new OpenHabConnector(settingsCache[context].openhab_server, context);
-				var state = await connector.GetCurrentStatus(settingsCache[context].openhab_item);
-					
+		async function ConnectOpenHab (action, context) {
 				
-				console.log(state);
-				counterAction.SetTitle(context, state.state);
-				if (state.state == "ON") {
-					counterAction.SetState( context, 1);
+				var connector = openHabConnectors[context]
+				if (connector != undefined) {
+					//connector.removeListener('testEvent', handleMyEvent);   // NICHT VERGESSEN DEN HANDLER WIEDER ZU SCHLISSEN
 				}
-				else if (state.state == "OFF") {
-					counterAction.SetState(context, 0)
-				}
-
-				connector.AddItemListener(settingsCache[context].openhab_item);
-				//openHabConnectors[context].connector = {};
+				connector = new OpenHabConnector(settingsCache[context].openhab_server, context);
 				openHabConnectors[context] = connector;
+			
+				if (settingsCache[context].openhab_item == "---") {
+					counterAction.GetAvailableItems(action, context);
+				} else {
+					counterAction.GetAvailableItems(action, context);
+					var state = await connector.GetCurrentStatus(settingsCache[context].openhab_item);						
+					
+					console.log(state);
+					counterAction.SetTitle(context, state.state);
+					if (state.state == "ON") {
+						counterAction.SetState( context, 1);
+					}
+					else if (state.state == "OFF") {
+						counterAction.SetState(context, 0)
+					}
 
-				connector.on('testEvent', handleMyEvent);
+					connector.AddItemListener(settingsCache[context].openhab_item);
+					//openHabConnectors[context].connector = {};
+					
+
+					connector.on('testEvent', handleMyEvent);
+				}
+				openHabConnectors[context] = connector;
 
 		}
 
 		const handleMyEvent = (context, data) => {
 			console.log('Was fired: ', data);
 			console.log(data);
+			
+			switch (data.ItemType) {
+				case ITEM_TYPE.SWITCH:
+					handleSwitchChangeEvent(context, data.value);
+					break;
+			
+				default:
+					break;
+			}
 
+			// Switch Event			
+			/*
 			var payload = JSON.parse(data.payload)
 			console.log(payload);
 
@@ -250,7 +293,28 @@
 			else if (payload.value == "OFF") {
 				counterAction.SetState(context, 0)
 			}
-			};
+				*/
+		};
+
+		function SendCurrentDataToPI (context) {
+			var connector = openHabConnectors[context];
+			if (connector == undefined) {
+				return;
+			}
+
+
+		}
+
+		function handleSwitchChangeEvent(context, value) {
+			counterAction.SetTitle(context, value);
+			if (value == "ON") {
+				counterAction.SetState(context, 1);
+			} 
+			else if (value == "OFF") {
+				counterAction.SetState(context, 0);
+			}
+		}
+
     	
         function connectElgatoStreamDeckSocket(inPort, inPluginUUID, inRegisterEvent, inInfo)
          {
@@ -285,7 +349,7 @@
 				var event = jsonObj['event'];
 				var action = jsonObj['action'];
 				var context = jsonObj['context'];
-				
+				console.log("Event: " + event);
 				if(event == "keyDown")
 				{
 					var jsonPayload = jsonObj['payload'];
@@ -300,14 +364,14 @@
 					var settings = jsonPayload['settings'];
 					var coordinates = jsonPayload['coordinates'];
 					var userDesiredState = jsonPayload['userDesiredState'];
-					counterAction.onKeyUp(context, settings, coordinates, userDesiredState);
+					counterAction.onKeyUp(action, context, settings, coordinates, userDesiredState);
 				}
 				else if(event == "willAppear")
 				{
 					var jsonPayload = jsonObj['payload'];
 					var settings = jsonPayload['settings'];
 					var coordinates = jsonPayload['coordinates'];
-					counterAction.onWillAppear(context, settings, coordinates);
+					counterAction.onWillAppear(action, context, settings, coordinates);
 					
 					/*
 					source.addEventListener('open', function(e) {
@@ -328,13 +392,19 @@
 					var coordinates = jsonPayload['coordinates'];
 					var userDesiredState = jsonPayload['userDesiredState'];
 					openHabConnectors[context].Close();
-					openHabConnectors[context] = null;
+					OpenHabConnectors[context] = undefined;
+					
 				}
 
 
 
 				else if (event == "sendToPlugin") {
 					var jsonPayload = jsonObj["payload"];
+					console.log("SendToPlugin: " + jsonPayload['type']);
+					if(jsonPayload['type'] == "init" ) {
+						console.log("Hello INIT");
+						counterAction.SendSettings(action, context);
+					}
 
 					if(jsonPayload['type'] == "updateSettings") {
 						counterAction.SetSettings(context, jsonPayload.data);
@@ -342,8 +412,13 @@
 
 						var conector = openHabConnectors[context];
 
-						if(settingsCache[context].openhab_server != conector.Server()) {
-							ConnectOpenHab(context);
+						if (conector == undefined && settingsCache[context].openhab_item == "---" ) {
+							ConnectOpenHab(action, context);
+						}
+
+						if(settingsCache[context].openhab_server != conector.Server() ||
+							settingsCache[context].openhab_item != conector.Item() ) {
+								ConnectOpenHab(action, context);
 						}
 
 
@@ -355,9 +430,13 @@
 					} else if(jsonPayload['type'] == "availableItems") {
 						counterAction.GetAvailableItems(action, context);
 					}
-				}else if (event == "propertyInspectorDidAppear") {
-					counterAction.SendToPI(context);
-				}else if(event == "didReceiveSettings") {
+				}
+				
+				else if (event == "propertyInspectorDidAppear") {
+					//counterAction.SendToPI(context);
+					counterAction.GetAvailableItems(action, context);
+				}
+				else if(event == "didReceiveSettings") {
 					console.log("Recieve Settings");
 				};
 			}
