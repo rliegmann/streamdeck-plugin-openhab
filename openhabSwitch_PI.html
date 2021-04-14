@@ -145,34 +145,6 @@
         }
     }
 
-
-    function setDomElements(value) {
-        console.log("Set config -> " + value.openhab_server);
-        console.log("Set config -> " + value.openhab_item)
-
-        document.getElementById("openhab_server").value = value.openhab_server;
-
-        var select = document.getElementById("openhab_item");
-        if(value.openhab_item == "not set") {
-            var opt = document.createElement('option');
-            opt.value = "notSet";
-            opt.innerHTML = "Not set";
-            select.appendChild(opt);
-        }
-
-        console.log("Set config -> finish " )
-    }
-
-    function UpdatePiUI (settings) {
-        connector = new OpenHabConnector(settings.openhab_server);
-        document.getElementById("openhab_server").value = connector.Server();
-       
-
-    }
-
-
-    var connector = null;    
-    
     function onLoad() {
         
         
@@ -189,36 +161,7 @@
             selectElement.remove(i);
         }
         }
-
-    function ItemRefresh() {
-        var select = document.getElementById("openhab_item");
-        removeOptions(select);
-
-        connector.GetAvailableItems("Switch")
-        .then(function(data) {
-            //console.log(data);     
-            data.forEach(function(entry) {
-                console.log(entry);
-                var opt = document.createElement('option');
-                opt.value = entry["name"];
-                opt.innerHTML = entry["name"];
-                select.appendChild(opt);
-            })        
-        })
-        .catch((error) => {
-            console.log('Error:', error);
-            var opt = document.createElement('option');
-            opt.value = "notSet";
-            opt.innerHTML = "check Connection";
-            select.appendChild(opt);
-        });
-    }
     
-    function SendINIT () {
-        let payload = {};
-        payload.type = "init";
-        sendValueToPlugin(payload);
-    }
 
     function sendValueToPlugin(payload) {
         if (websocket) {
