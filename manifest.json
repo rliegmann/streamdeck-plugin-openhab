@@ -2,7 +2,7 @@
   "Actions": [
     {
       "Icon": "pluginIcon", 
-      "Name": "OpenHAB Switch", 
+      "Name": "Switch", 
       "States": [
         {
           "Image": "icons/switch_off",
@@ -17,12 +17,12 @@
       ],
       "PropertyInspectorPath": "openhabSwitch_PI.html", 
       "SupportedInMultiActions": true,
-      "Tooltip": "How many times did you get pwned today? Keep track with this counter.", 
+      "Tooltip": "Simple switch that changes between ON / OFF depending on the previous status.", 
       "UUID": "com.temp.openhab"
     },
     {
       "Icon": "pluginIcon", 
-      "Name": "Openhab2", 
+      "Name": "Button", 
       "States": [
         {
           "Image": "pluginIcon",
@@ -30,9 +30,24 @@
           "FontSize": "16"
         }
       ], 
+      "PropertyInspectorPath": "openhabButton_PI.html",
       "SupportedInMultiActions": true,
-      "Tooltip": "How many times did you get pwned today? Keep track with this counter.", 
-      "UUID": "com.temp.openhab2"
+      "Tooltip": "Simple button that sends the specified property.", 
+      "UUID": "com.temp.openhab.button"
+    },
+    {
+      "Icon": "pluginIcon",
+      "Name":  "Lable",
+      "States": [
+        {
+          "Image": "pluginIcon",
+          "TitleAlignment": "middle",
+          "FontSize": "16"
+        }
+      ],
+      "PropertyInspectorPath": "openhabLable_PI.html",
+      "Tooltip": "Simple display of the status",
+      "UUID": "com.temp.openhab.lable"
     }
   ], 
   "SDKVersion": 2,
