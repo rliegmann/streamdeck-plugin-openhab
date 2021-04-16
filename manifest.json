@@ -45,7 +45,7 @@
           "FontSize": "16"
         }
       ],
-      "PropertyInspectorPath": "openhabLable_PI.html",
+      "PropertyInspectorPath": "pi/index.html",
       "Tooltip": "Simple display of the status",
       "UUID": "com.temp.openhab.lable"
     }

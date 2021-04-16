@@ -1,0 +1,30 @@
+<head>
+    <meta charset="utf-8" />
+    <title>com.temp.openhab.pi</title>
+    <link rel="stylesheet" href="sdpi.css">
+
+     <!-- Import scripts -->
+     <script src="pi_lable.js"></script>
+     <script src="pi_switch.js"></script>
+     <script src="pi_master.js"></script>
+     <script src="pi_main.js"></script>
+</head>
+
+<body>
+    <div class="sdpi-wrapper">
+        <!-- OpenHAB  Server-->
+        <div class="sdpi-item">
+            <div class="sdpi-item-label">OpenHAB Server</div> 
+            <input class="sdpi-item-value" type="text" id="openhab_server" value="http://openhab:8080">
+        </div>    
+
+        <!-- OpenHAB  Item-->
+        <div class="sdpi-item" id="select_single">
+            <div class="sdpi-item-label">Item</div> 
+            <select class="sdpi-item-value select" id="openhab_item" style="width: 170px">
+                <option selected="selected" value="---">---</option>
+            </select> 
+            <button onclick="onButtonRefreshItems()" class="sdpi-item-value max10" value="Click Me only">&#8635;</button>
+       </div>
+    <div>
+</body>
