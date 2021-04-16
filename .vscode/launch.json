@@ -4,11 +4,18 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+    
         {
-            "type": "devtools-for-chrome",
+            "name": "Attach to url with files",
+            "type": "pwa-chrome",
             "request": "attach",
-            "name": "Attach Chrome DevTools",
-            "url": "http://localhost:9222/"
+            "port": 9222,
+            //"urlFilter": "http://localhost:23654/devtools/devtools_app.html?*",
+            //"webRoot": "${workspaceFolder}/pi",
+            "sourceMaps": true,
+            "sourceMapPathOverrides": {
+                "http://localhost:23654/devtools/devtools_app.html": "${workspaceFolder}/pi",
+            }
         }
     ]
 }

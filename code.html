@@ -200,10 +200,23 @@
 				payload.data = [];
 				payload.type = "getAvailableItemsResponse";
 				payload.failed = false;
+				var itemType = null;
+
+				switch (action) {
+					case "com.temp.openhab.lable":
+						itemType = ITEM_TYPE.NONE;
+						break;
+					case "com.temp.openhab.switch":
+						itemType = ITEM_TYPE.SWITCH;
+						break
+					default:
+						itemType = ITEM_TYPE.NONE;
+						break;
+				}
 
 				var connector = openHabConnectors[context];
 
-				connector.GetAvailableItems(ITEM_TYPE.SWITCH)
+				connector.GetAvailableItems(itemType)
 				.then(function(data) {
 					data.forEach(function(entry) {
 						//payload.data = {name: entry["name"]};
@@ -276,7 +289,9 @@
 				case ITEM_TYPE.SWITCH:
 					handleSwitchChangeEvent(context, data.value);
 					break;
-			
+				case ITEM_TYPE.NONE:
+					handleLableChangeEvent(context, data.value);
+					break;
 				default:
 					break;
 			}
@@ -313,6 +328,10 @@
 			else if (value == "OFF") {
 				counterAction.SetState(context, 0);
 			}
+		}
+
+		function handleLableChangeEvent(context, value) {
+			counterAction.SetTitle(context, value);
 		}
 
     	

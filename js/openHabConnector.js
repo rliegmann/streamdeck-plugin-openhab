@@ -95,9 +95,13 @@ class OpenHabConnector {
                         this.itemState = SWITCH_STATE.OFF;
                     }
                     var outData = new OpenHabConnectorItemChangedEvent(ITEM_TYPE.SWITCH, payload.type, payload.value, payload.oldType, payload.oldValue);
-                    break;            
+                    break;  
+                case "Decimal":
+                    var outData = new OpenHabConnectorItemChangedEvent(ITEM_TYPE.NONE, payload.type, payload.value, payload.oldType, payload.oldValue);
+                    break;          
                 default:
-                    return;
+                    var outData = new OpenHabConnectorItemChangedEvent(ITEM_TYPE.NONE, payload.type, payload.value, payload.oldType, payload.oldValue);
+                    break;
             }
             
           callback(this.context, outData);
@@ -121,10 +125,18 @@ class OpenHabConnector {
      }
 
     GetAvailableItems(itemType = ITEM_TYPE) {
-        var itemType = ConvertItemTypeToString(itemType);
+        var url = this.baseUrl + "items?";
+        var type = ConvertItemTypeToString(itemType);
+
+        if (itemType == ITEM_TYPE.NONE) {
+            url = url + "recursive=false";
+        } else {
+            url = url + "type="+type + "&recursive=false";
+        }
+        
         return new Promise((resolve, reject) => {
             let image;  
-            fetch(this.baseUrl + "items?type="+itemType+"&recursive=false")
+            fetch(url)
             .then(function(response) {
                 if (response.status !== 200) {
                     console.log('Looks like there was a problem. Status Code: ' +
