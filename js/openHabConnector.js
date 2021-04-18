@@ -57,7 +57,9 @@ class OpenHabConnector {
     }
 
     Close() {
-        this.openHabEventSource.close();
+        if (this.openHabEventSource != null) {
+            this.openHabEventSource.close();
+        }
     }
 
     on(name, listener) {

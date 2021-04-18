@@ -51,8 +51,8 @@
     }
   ], 
   "SDKVersion": 2,
-  "Author": "Elgato", 
-  "CodePath": "code.html", 
+  "Author": "Elgato",   
+  "CodePath": "plugin/index.html",
   "Description": "Track the number of times you press a key.", 
   "Name": "Counter", 
   "Icon": "pluginIcon", 
