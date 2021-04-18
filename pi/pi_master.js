@@ -7,6 +7,7 @@ function MasterPI (inContext, inLanguage) {
     // Add event listener
     document.getElementById('openhab_server').addEventListener('change', serverChanged);
     document.getElementById('openhab_item').addEventListener('change', itemChanged);
+    document.getElementById('openhab_item_refresh').addEventListener('click', refresh);
 
     function serverChanged(inEvent) {
         instance.setSettings();
@@ -15,6 +16,10 @@ function MasterPI (inContext, inLanguage) {
 
     function itemChanged(inEvent) {
         instance.setSettings();
+    }
+
+    function refresh(inEvent) {
+        instance.getAvailableItems();
     }
 
     function getCurrentAction() {

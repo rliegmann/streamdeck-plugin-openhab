@@ -84,6 +84,9 @@ function connectElgatoStreamDeckSocket(inPort, inPluginUUID, inRegisterEvent, in
             else if (jsonPayload['type'] == "requestSettings") {
                 actions[context].SendSettings();
             }
+            else if (jsonPayload['type'] == "availableItems") {
+                actions[context].GetAvailableItems();
+            }
         }
 
 
