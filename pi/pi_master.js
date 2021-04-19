@@ -7,6 +7,7 @@ function MasterPI (inContext, inLanguage) {
     // Add event listener
     document.getElementById('openhab_server').addEventListener('change', serverChanged);
     document.getElementById('openhab_item').addEventListener('change', itemChanged);
+    document.getElementById('openhab_item_refresh').addEventListener('click', refresh);
 
     function serverChanged(inEvent) {
         instance.setSettings();
@@ -17,11 +18,18 @@ function MasterPI (inContext, inLanguage) {
         instance.setSettings();
     }
 
+    function refresh(inEvent) {
+        instance.getAvailableItems();
+    }
+
     function getCurrentAction() {
         var action
 
         if (instance instanceof PI_Lable) {
             action = "com.temp.openhab.lable";
+        }
+        if (instance instanceof PI_Switch) {
+            action = "com.temp.openhab.switch";
         }
 
         return action;

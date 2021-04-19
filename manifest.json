@@ -15,10 +15,10 @@
           "FontSize": "16"
         }
       ],
-      "PropertyInspectorPath": "openhabSwitch_PI.html", 
+      "PropertyInspectorPath": "pi/index.html", 
       "SupportedInMultiActions": true,
       "Tooltip": "Simple switch that changes between ON / OFF depending on the previous status.", 
-      "UUID": "com.temp.openhab"
+      "UUID": "com.temp.openhab.switch"
     },
     {
       "Icon": "pluginIcon", 
@@ -51,8 +51,8 @@
     }
   ], 
   "SDKVersion": 2,
-  "Author": "Elgato", 
-  "CodePath": "code.html", 
+  "Author": "Elgato",   
+  "CodePath": "plugin/index.html",
   "Description": "Track the number of times you press a key.", 
   "Name": "Counter", 
   "Icon": "pluginIcon", 

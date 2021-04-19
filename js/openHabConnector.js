@@ -57,7 +57,9 @@ class OpenHabConnector {
     }
 
     Close() {
-        this.openHabEventSource.close();
+        if (this.openHabEventSource != null) {
+            this.openHabEventSource.close();
+        }
     }
 
     on(name, listener) {
@@ -177,7 +179,7 @@ class OpenHabConnector {
             */
     }
 
-    SendCommandToItem(command = SWITCH_STATE) {
+    SendCommandToItem(type = ITEM_TYPE, command) {
         return new Promise((resolve, reject) => {
             fetch(this.baseUrl + "items/" + this.item, {
                 method: 'post',                
