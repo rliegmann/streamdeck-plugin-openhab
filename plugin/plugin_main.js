@@ -55,7 +55,7 @@ function connectElgatoStreamDeckSocket(inPort, inPluginUUID, inRegisterEvent, in
                     actions[context] = new ActionLable(context, action, settings, coordinates);
                 }
                 else if (action == 'com.temp.openhab.switch') {
-                    actions[context] = new ActionSwitch(context);
+                    actions[context] = new ActionSwitch(context, action, settings, coordinates);
                 }
             }
         }

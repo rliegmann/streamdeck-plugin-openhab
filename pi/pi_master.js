@@ -28,6 +28,9 @@ function MasterPI (inContext, inLanguage) {
         if (instance instanceof PI_Lable) {
             action = "com.temp.openhab.lable";
         }
+        if (instance instanceof PI_Switch) {
+            action = "com.temp.openhab.switch";
+        }
 
         return action;
     }
