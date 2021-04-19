@@ -77,11 +77,13 @@ function Action(inAction, inContext, settings, coordinates) {
     this.GetAvailableItems = function (itemType) {
         var type = null;
 
-        switch (itemType) {
-            case "none":
+        switch (action) {
+            case "com.temp.openhab.lable":
                 type = ITEM_TYPE.NONE;
                 break;
-        
+            case "com.temp.openhab.switch":
+                type = ITEM_TYPE.SWITCH;
+                break;        
             default:
                 type = ITEM_TYPE.NONE;
                 break;
@@ -110,6 +112,17 @@ function Action(inAction, inContext, settings, coordinates) {
     this.GetCurrentStatus = async function() {
         return await OpenhabConnector.GetCurrentStatus(settingsCache.openhab_item);
     }
+
+    this.SendComandToItem = function(itemType, command) {
+        var openhabItemType = ITEM_TYPE.NONE;
+        switch (itemType) {
+            case 'switch': openhabItemType = ITEM_TYPE.SWITCH;                
+                break;        
+            default:
+                return;
+        }
+        OpenhabConnector.SendCommandToItem(openhabItemType, command);
+    }
     
     this.SendToPI = function(action, payload) {
         if(websocket) {
@@ -133,6 +146,20 @@ function Action(inAction, inContext, settings, coordinates) {
                 'payload': payload
             }
             console.log("SetTitle: " + payload);
+            websocket.send(JSON.stringify(json));
+        }
+    }
+
+    this.SetState = function(state) {
+        if (websocket) {
+            var json = {
+                event: 'setState',
+                context: context,
+                payload: {
+                    state: state,
+                } 
+            }
+            console.log("SetState: " + json);
             websocket.send(JSON.stringify(json));
         }
     }
@@ -168,6 +195,9 @@ function Action(inAction, inContext, settings, coordinates) {
         //... other configs
     });
 
+    Object.defineProperty(this, 'ItemState', {
+        get: function() { return OpenhabConnector.ItemState(); }
+    })
     
 }
 
