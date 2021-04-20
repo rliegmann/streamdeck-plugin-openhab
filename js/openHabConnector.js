@@ -52,10 +52,6 @@ class OpenHabConnector {
           };
     }
 
-    Connect() {
-
-    }
-
     Close() {
         if (this.openHabEventSource != null) {
             this.openHabEventSource.close();
