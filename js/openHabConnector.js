@@ -110,11 +110,7 @@ class OpenHabConnector {
         };
     
         this._events[name].forEach(fireCallbacks);
-    }
-     
-    cakeRecipe() {
-       return baseUrl;
-    }   
+    }       
 
     Server() {
         return this.server;
@@ -206,11 +202,3 @@ function ConvertItemTypeToString (itemType = ITEM_TYPE) {
             return "none";            ;
     }
 }
-
-async function getUserAsync(name) 
-{
-  let response = await fetch(`https://api.github.com/users/${name}`);
-  let data = await response.json()
-  return data;
-}
-
