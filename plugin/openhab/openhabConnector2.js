@@ -10,6 +10,11 @@ class OpenHabConnector2 {
     }
 
     RegisterServer(url) {
+        if (url == this.host) {
+            console.log("Server allready registred");
+            return;
+        }
+
         this.host = url;
         this.baseUrl = url + "/rest/";
     }
@@ -176,8 +181,8 @@ class OpenHabConnector2 {
 };
 
 
-var client = new OpenHabConnector2();
-client.RegisterServer("http://openhab:8080");
+//var client = new OpenHabConnector2();
+//client.RegisterServer("http://openhab:8080");
 
 /*
 var payload = {};
@@ -196,6 +201,7 @@ client.GetAvailableItems(ITEM_TYPE.SWITCH)
         }); 
 */
 
+/*
 (async () => {
     const data = await client.GetCurrentStatus("SchlafzimmerLight_SchlafzimmerLampe");
     console.log(data);
@@ -213,5 +219,6 @@ client.GetAvailableItems(ITEM_TYPE.SWITCH)
    });
 
 })();
+*/
 
 

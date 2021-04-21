@@ -4,6 +4,7 @@ var websocket = null;
 function connectElgatoStreamDeckSocket(inPort, inPluginUUID, inRegisterEvent, inInfo) {
     
     var actions = {};
+    var openHabConnector = new OpenHabConnector2();
 
     websocket = new WebSocket('ws://127.0.0.1:' + inPort);
 
@@ -52,10 +53,10 @@ function connectElgatoStreamDeckSocket(inPort, inPluginUUID, inRegisterEvent, in
 
             if (!(context in actions)) {
                 if(action == 'com.temp.openhab.lable') {
-                    actions[context] = new ActionLable(context, action, settings, coordinates);
+                    actions[context] = new ActionLable(context, action, settings, coordinates, openHabConnector);
                 }
                 else if (action == 'com.temp.openhab.switch') {
-                    actions[context] = new ActionSwitch(context, action, settings, coordinates);
+                    actions[context] = new ActionSwitch(context, action, settings, coordinates, openHabConnector);
                 }
             }
         }

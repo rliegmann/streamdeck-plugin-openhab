@@ -3,11 +3,11 @@ let initConfig = {
     openhab_item: "---",
 };
 
-function Action(inAction, inContext, settings, coordinates) {
+function Action(inAction, inContext, settings, coordinates, openhabConnector) {
     var action = inAction;
     var context = inContext;
     var settingsCache = {};
-    var OpenhabConnector = null;
+    var OpenhabConnector = openhabConnector;
     var _events = {};
 
     settingsCache = { openhab_server: initConfig.openhab_server,
@@ -58,6 +58,11 @@ function Action(inAction, inContext, settings, coordinates) {
     }
 
     async function RefreshOpenhabConnection() {
+        if (OpenHabConnector.Server != settingsCache.openhab_server) {
+            OpenhabConnector.RegisterServer(settingsCache.openhab_server);
+        }
+
+
         OpenhabConnector = new OpenHabConnector(settingsCache.openhab_server, inContext);
         if (settingsCache.openhab_item == "---") {
 
