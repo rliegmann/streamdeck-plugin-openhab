@@ -3,6 +3,7 @@ var websocket = null;
 
 function connectElgatoStreamDeckSocket(inPort, inPluginUUID, inRegisterEvent, inInfo) {
     
+    var gSettings = {};
     var actions = {};
     var openHabConnector = new OpenHabConnector2();
 
@@ -75,6 +76,9 @@ function connectElgatoStreamDeckSocket(inPort, inPluginUUID, inRegisterEvent, in
         }
         else if (event == 'propertyInspectorDidDisappear') {
 
+        }
+        else if (event === 'didReceiveGlobalSettings') {
+            gSettings = jsonPayload['settings'];
         }
         else if (event == 'sendToPlugin') {
             console.log("Plugin:    SendToPlugin:  " + jsonPayload['type']);

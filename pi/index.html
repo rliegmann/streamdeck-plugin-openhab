@@ -12,11 +12,23 @@
 
 <body>
     <div class="sdpi-wrapper">
-        <!-- OpenHAB  Server-->
+        <div class="sdpi-heading">Main Settings</div>
+        <!--  OpenHAB  Server-->
+        <div class="sdpi-item" id="select_single">
+            <div class="sdpi-item-label">OpenHAB Server</div>
+            <select class="sdpi-item-value select" id="server_select">               
+                <option value="noServer">no Server</option>
+            </select>
+        </div>       
+
         <div class="sdpi-item">
-            <div class="sdpi-item-label">OpenHAB Server</div> 
-            <input class="sdpi-item-value" type="text" id="openhab_server" value="http://openhab:8080">
-        </div>    
+            <div class="sdpi-item-label"></div>            
+            <button id="button_new" class="sdpi-item-value">New</button>
+            <button id="button_edit" class="sdpi-item-value">Edit</button>
+            <button id="button_delete" class="sdpi-item-value">Delete</button>
+       </div>
+
+       <hr>       
 
         <!-- OpenHAB  Item-->
         <div class="sdpi-item" id="select_single">

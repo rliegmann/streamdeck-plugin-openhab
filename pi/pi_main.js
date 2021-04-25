@@ -1,6 +1,8 @@
 
 // Global web socket
 var websocket = null;
+var pluginUUID;
+var gSettings = {};
 
 function connectElgatoStreamDeckSocket(inPort, inUUID, inRegisterEvent, inInfo, inActionInfo) {
     var actionInfo = JSON.parse(inActionInfo);
@@ -22,6 +24,8 @@ function connectElgatoStreamDeckSocket(inPort, inUUID, inRegisterEvent, inInfo, 
             uuid: inUUID
         };
         websocket.send(JSON.stringify(json));
+
+        GetGlobalSettings(inUUID);
     }
 
 
@@ -41,7 +45,10 @@ function connectElgatoStreamDeckSocket(inPort, inUUID, inRegisterEvent, inInfo, 
         var payload = jsonObj["payload"];
 
         if(event === 'didReceiveGlobalSettings') {
-            
+            console.log("Global Settings received:");
+            console.log(payload['settings']);
+            gSettings = payload['settings'];
+            pi.handleGlobalSettings();
         }
         else if(event === 'didReceiveSettings') {
             
@@ -94,6 +101,28 @@ function GetAvailableItems(action, context) {
             "context": context,
             "payload": payload,
         }
+        websocket.send(JSON.stringify(json));
+    }
+}
+
+function GetGlobalSettings(uuid) {
+    if (websocket) {
+        var json = {
+            'event': 'getGlobalSettings',
+            'context': uuid
+        };
+
+        websocket.send(JSON.stringify(json));
+    }
+}
+
+function SetGlobalSettings(uuid) {
+    if (websocket) {
+        var json = {
+            "event": "setGlobalSettings",
+            "context": uuid,
+            "payload": gSettings
+        };
         websocket.send(JSON.stringify(json));
     }
 }
