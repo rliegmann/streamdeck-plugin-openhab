@@ -4,8 +4,7 @@ function MasterPI (inContext, inLanguage) {
     // Init PI
     var instance = this;
 
-    // Add event listener
-    document.getElementById('openhab_server').addEventListener('change', serverChanged);
+    // Add event listener   
     document.getElementById('openhab_item').addEventListener('change', itemChanged);
     document.getElementById('openhab_item_refresh').addEventListener('click', refresh);
 
@@ -77,6 +76,8 @@ function MasterPI (inContext, inLanguage) {
             opt.innerHTML = gSettings.servers[entry].name;
             serverSelect.appendChild(opt);
         })
+
+        RequestSettings(getCurrentAction(), inContext);
 
     }
 
@@ -174,8 +175,10 @@ function MasterPI (inContext, inLanguage) {
         var openhab_server = data.openhab_server;
         var openhab_item = data.openhab_item;
 
-        document.getElementById("openhab_server").value = openhab_server;
-                        
+        var server_opt = document.getElementById("server_select").value = openhab_server;
+        server_opt.selected = 'selected';
+
+
         OpenhabItemHelerLastSelect = openhab_item;
         var opt = document.getElementById('openhab_item').value=openhab_item;
         opt.selected = 'selected';
