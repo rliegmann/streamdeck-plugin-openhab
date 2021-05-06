@@ -28,6 +28,7 @@ function Action(inAction, inContext, settings, coordinates, openhabConnector) {
     var _events = {};
     var isEventRegest = false;
     var isInitialized = false;
+    var _currentItemState = null;
 
     previousSettingsCache = { openhab_server: '---',
                                 openhab_item: '---'}; 
@@ -57,6 +58,7 @@ function Action(inAction, inContext, settings, coordinates, openhabConnector) {
         if (match[1] == settingsCache.openhab_item) {
             console.log(match[1]); // abc
             var payload = JSON.parse(obj.payload);
+            _currentItemState = payload.value;
             emit("onItemStateChanged", new ActionItemChangedEcentPayload(payload.type, payload.value, payload.oldType, payload.oldValue));
         }
     };
@@ -118,6 +120,7 @@ function Action(inAction, inContext, settings, coordinates, openhabConnector) {
         else {
             var state = await OpenhabConnector.GetCurrentStatus(settingsCache.openhab_server, settingsCache.openhab_item);
             var item = {value: state.state}; // THIS is not the findale  Change this
+            _currentItemState = item.value;
             emit("onItemStateChanged", new ActionItemChangedEcentPayload("-", item.value, "-", "-"));
 
             if ( previousSettingsCache.openhab_item != settingsCache.openhab_item ) {
@@ -183,7 +186,7 @@ function Action(inAction, inContext, settings, coordinates, openhabConnector) {
             default:
                 return;
         }
-        OpenhabConnector.SendCommandToItem(openhabItemType, command);
+        OpenhabConnector.SendCommandToItem(settingsCache.openhab_server, settingsCache.openhab_item, command);
     }
     
     this.SendToPI = function(action, payload) {
@@ -260,7 +263,7 @@ function Action(inAction, inContext, settings, coordinates, openhabConnector) {
     });
 
     Object.defineProperty(this, 'ItemState', {
-        get: function() { return OpenhabConnector.ItemState(); }
+        get: function() { return _currentItemState; }
     })
 
     if (!OpenhabConnector.CheckServerIsRegestrated(settingsCache.openhab_server)) {

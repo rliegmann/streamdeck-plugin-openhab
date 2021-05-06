@@ -109,7 +109,7 @@ class OpenHabServer {
     // ToDo do nicer error handling
     SendCommandToItem(item, command) {
         new Promise((resolove, reject) => {
-            fetch(this.baseUrl + 'items/' + item, {
+            fetch(this._baseURL() + 'items/' + item, {
                 method: 'post',
                 body: command
             })
@@ -295,8 +295,9 @@ class OpenHabConnector2 {
     }
 
     // ToDo do nicer error handling
-    SendCommandToItem(item, command) {
+    SendCommandToItem(uuid, item, command) {
         //Call the right UUID connection
+        this._serverList[uuid].SendCommandToItem(item, command);
     }    
 
     get Servers() {
