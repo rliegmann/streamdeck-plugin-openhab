@@ -4,14 +4,81 @@ function MasterPI (inContext, inLanguage) {
     // Init PI
     var instance = this;
 
-    // Add event listener
-    document.getElementById('openhab_server').addEventListener('change', serverChanged);
+    // Add event listener   
     document.getElementById('openhab_item').addEventListener('change', itemChanged);
     document.getElementById('openhab_item_refresh').addEventListener('click', refresh);
+
+    document.getElementById('button_new').addEventListener('click', pressedAddServer);
+    document.getElementById('button_delete').addEventListener('click', pressedDeleteServer);
+    document.getElementById('server_select').addEventListener('change', serverChanged2);
 
     function serverChanged(inEvent) {
         instance.setSettings();
         instance.getAvailableItems();
+    }
+
+    function serverChanged2(inEvent) {
+        instance.setSettings();
+        instance.getAvailableItems();
+    }
+
+    function pressedAddServer(event) {
+        var popup = window.open('pi_addServer.html');
+        window.addEventListener('message', (event) => {
+             // Do we trust the sender of this message?  (might be
+                // different from what we originally opened, for example).
+                if (event.origin !== "file://")
+                  return;
+
+                console.log("Handle new Server from NewServer Page");
+                if (gSettings.servers === undefined) {
+                    gSettings.servers = {};
+                }
+                var newSettings = event.data;
+                gSettings.servers[newSettings.uuid] = {
+                    protocoll: newSettings.protocoll,
+                    url: newSettings.url,
+                    name: newSettings.name,
+                }
+                SetGlobalSettings(inContext);
+                instance.handleGlobalSettings();
+
+            window.removeEventListener('message', this, true);
+        }, false);
+    }
+
+    function pressedDeleteServer(event) {
+        gSettings.servers = {};
+        SetGlobalSettings(inContext);
+    }
+
+    this.handleGlobalSettings = function() {
+        var serverSelect = document.getElementById('server_select');
+        removeOptions(serverSelect);
+
+        /*
+        if(gSettings.test["abc"] == "12345" ) {
+            alert("OK");
+        }
+        */
+        var opt = document.createElement('option');
+        opt.value = "---";
+        opt.innerHTML = "---";
+        serverSelect.appendChild(opt);
+
+
+        var select = document.getElementById('server_select');
+        Object.keys(gSettings.servers).forEach(entry => {            
+            console.log(gSettings.servers[entry]);
+
+            var opt = document.createElement('option');
+            opt.value = entry;
+            opt.innerHTML = gSettings.servers[entry].name;
+            serverSelect.appendChild(opt);
+        })
+
+        RequestSettings(getCurrentAction(), inContext);
+
     }
 
     function itemChanged(inEvent) {
@@ -38,10 +105,10 @@ function MasterPI (inContext, inLanguage) {
     this.setSettings = function () {
         var newSettings = {};
 
-        var itemSelect = document.getElementById('openhab_item');
+        var itemSelect = document.getElementById('server_select');
 
-        newSettings.openhab_server = document.getElementById('openhab_server').value;
-        newSettings.openhab_item = itemSelect.options[itemSelect.selectedIndex].value;
+        newSettings.openhab_server = itemSelect.options[itemSelect.selectedIndex].value;
+        newSettings.openhab_item = document.getElementById('openhab_item').value;
 
         SendSettings(getCurrentAction(), inContext, newSettings);
     }
@@ -108,8 +175,10 @@ function MasterPI (inContext, inLanguage) {
         var openhab_server = data.openhab_server;
         var openhab_item = data.openhab_item;
 
-        document.getElementById("openhab_server").value = openhab_server;
-                        
+        var server_opt = document.getElementById("server_select").value = openhab_server;
+        server_opt.selected = 'selected';
+
+
         OpenhabItemHelerLastSelect = openhab_item;
         var opt = document.getElementById('openhab_item').value=openhab_item;
         opt.selected = 'selected';
