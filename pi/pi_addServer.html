@@ -1,0 +1,45 @@
+<head>
+    <meta charset="utf-8" />
+    <title>com.temp.openhab.pi.addServer</title>
+    <link rel="stylesheet" href="sdpi.css">
+
+    <script src="libs/PopupTools.js"></script>
+    <script src="pi_addServer.js"></script>
+</head>
+
+<body>
+
+   
+
+<div style="margin-top: 20px; margin-right: 20px;">
+    <h2 style="text-align: center; ">OpenHAB Server hinzufügen</h2>
+</div>
+
+<div style=" text-align: center; margin-left: auto;">
+    <input id="input_name" style="height: 50px; min-height: 50px;  font-size: large;" type="text" value="Name">
+</div>
+
+<div style=" text-align: center; margin-left: auto;">
+    <select id="select_protocoll" style="height: 50px; min-height: 50px; min-width: 50px; font-size: large;">
+        <option selected="selected" value="http">http</option>
+        <option value="https">https</option>
+    </select>
+    <input  id="input_url"  style="height: 50px; min-height: 50px; min-width: 50px; font-size: large;" type="text" value="openhab:8080">
+    </div>
+
+<div style="text-align: center;">
+    <span id="span_checkOK" style="height: 50px; min-height: 50px; min-width: 50px; font-size: large;"></span>
+
+</div>
+
+
+<div style=" text-align: center; margin-left: auto; margin-top: 1%">
+    <button id="button_check" style="text-align: center; margin-left: auto; width: 80px;" value="Check">Check</button>
+
+    <button id="button_add" style="text-align: center; margin-left: auto; width: 80px;" disabled >Hinzufügen</button>
+</div>
+
+
+
+
+</body>

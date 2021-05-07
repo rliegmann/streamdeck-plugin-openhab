@@ -3,17 +3,23 @@ var websocket = null;
 
 function connectElgatoStreamDeckSocket(inPort, inPluginUUID, inRegisterEvent, inInfo) {
     
+    var gSettings = {};
     var actions = {};
+    var openHabConnector = new OpenHabConnector2();
 
     websocket = new WebSocket('ws://127.0.0.1:' + inPort);
 
     // ToTo  use a global function for plugin and pi regestration
     websocket.onopen = function() {
+
+        
         var json = {
             "event": inRegisterEvent,
             "uuid": inPluginUUID
         };
         websocket.send(JSON.stringify(json));
+
+        GetGlobalSettings(inPluginUUID);
     }
 
     websocket.onmessage = function(inEvent) {
@@ -24,8 +30,8 @@ function connectElgatoStreamDeckSocket(inPort, inPluginUUID, inRegisterEvent, in
         var context = jsonObj['context'];
         var jsonPayload = jsonObj['payload'];
 
-        console.log("Incomming Message");
-        console.log(event);
+        console.log("Incomming Message: " + event);
+        
 
         // Key up event
         if(event == 'keyUp') {
@@ -52,10 +58,10 @@ function connectElgatoStreamDeckSocket(inPort, inPluginUUID, inRegisterEvent, in
 
             if (!(context in actions)) {
                 if(action == 'com.temp.openhab.lable') {
-                    actions[context] = new ActionLable(context, action, settings, coordinates);
+                    actions[context] = new ActionLable(context, action, settings, coordinates, openHabConnector);
                 }
                 else if (action == 'com.temp.openhab.switch') {
-                    actions[context] = new ActionSwitch(context, action, settings, coordinates);
+                    actions[context] = new ActionSwitch(context, action, settings, coordinates, openHabConnector);
                 }
             }
         }
@@ -75,6 +81,32 @@ function connectElgatoStreamDeckSocket(inPort, inPluginUUID, inRegisterEvent, in
         else if (event == 'propertyInspectorDidDisappear') {
 
         }
+        else if (event === 'didReceiveGlobalSettings') {
+            gSettings = jsonPayload['settings'];
+
+
+            Object.keys(openHabConnector.Servers).forEach(element => {
+                if ( !(element in gSettings.servers) ) {
+                    openHabConnector.DeregisterServer(element);
+                }
+            });
+
+            Object.keys(gSettings.servers).forEach(entry => {            
+                console.log(gSettings.servers[entry]);    
+               
+               if ( !(entry in openHabConnector.Servers) ) {
+                   openHabConnector.RegisterServer(entry, gSettings.servers[entry].protocoll, gSettings.servers[entry].url, gSettings.servers[entry].name);
+               }
+               
+            })
+
+            Object.keys(actions).forEach(entry => {   
+                if (!entry.isInitialized)   {       
+                    console.log(actions[entry].RefreshOpenhabConnection());   
+                } 
+                             
+            })
+        }
         else if (event == 'sendToPlugin') {
             console.log("Plugin:    SendToPlugin:  " + jsonPayload['type']);
 
@@ -90,5 +122,16 @@ function connectElgatoStreamDeckSocket(inPort, inPluginUUID, inRegisterEvent, in
         }
 
 
+    }
+}
+
+function GetGlobalSettings(uuid) {
+    if (websocket) {
+        var json = {
+            'event': 'getGlobalSettings',
+            'context': uuid
+        };
+
+        websocket.send(JSON.stringify(json));
     }
 }

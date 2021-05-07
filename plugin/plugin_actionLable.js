@@ -1,36 +1,16 @@
-function ActionLable (inContext, inAction, inSettings, coordinates) {
+function ActionLable (inContext, inAction, inSettings, coordinates, openhabConnector) {
     var instance = this;
     var action = inAction;
 
-    Action.call(this, inAction, inContext, inSettings, coordinates);  
-
-    if (instance.Settings.openhab_item == "---") {
-        console.log("BIS Hier habe ich es geschafft");      
-               
-    }
-
-    const handleOnItemStateChanged = (data) => {
-        console.log('Was fired: ', data);
-        
-        var payload = {            
-                title: data.value,
-                target: STREAM_DECK_TARGET_TYPE.BOTH,
-                state: 0
-            };
-            instance.SetTitle(payload);
-    
-    };
-
-    instance.on("onItemStateChanged", handleOnItemStateChanged);
-
-    
-    GetAvailableItems = function() {
+    this.GetAvailableItems = function() {
         instance.GetAvailableItems("none");
     }
 
     this.SetNewSettings = async function(newSettings) {
         console.log("Setze neue Settings in ActionLable");
-      
+
+
+      /*
         if (newSettings.openhab_server != instance.Settings.openhab_server ||
             newSettings.openhab_item != instance.Settings.openhab_item) {
                 //instance.SetBaseSettings(newSettings.openhab_server, newSettings.openhab_item);
@@ -45,6 +25,7 @@ function ActionLable (inContext, inAction, inSettings, coordinates) {
                     console.log("SATAE:   " + state);
                 }
         }   
+        */
         
         instance.Settings = newSettings;
          
@@ -65,4 +46,31 @@ function ActionLable (inContext, inAction, inSettings, coordinates) {
     this.onKeyUp = function (context) {
         console.log("FIRE KEY UP");
     }
+
+
+
+
+    Action.call(this, inAction, inContext, inSettings, coordinates, openhabConnector);  
+
+    if (instance.Settings.openhab_item == "---") {
+        console.log("BIS Hier habe ich es geschafft");      
+               
+    }
+
+    const handleOnItemStateChanged = (data) => {
+        console.log('Was fired: ', data);
+                
+        var payload = {            
+                title: data.value,
+                target: STREAM_DECK_TARGET_TYPE.BOTH,
+                state: 0
+            };
+            instance.SetTitle(payload);
+    
+    };
+
+    instance.on("onItemStateChanged", handleOnItemStateChanged);
+
+    
+    
 }
