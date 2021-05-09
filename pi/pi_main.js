@@ -37,6 +37,9 @@ function connectElgatoStreamDeckSocket(inPort, inUUID, inRegisterEvent, inInfo, 
     if (action === 'com.temp.openhab.switch') {
         pi = new PI_Switch(inUUID, language);
     }
+    if (action === 'com.temp.openhab.button') {
+        pi = new PI_Button(inUUID, language);
+    }
 
 
     websocket.onmessage = function (evt) {

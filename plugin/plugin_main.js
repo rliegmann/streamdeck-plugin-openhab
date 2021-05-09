@@ -63,6 +63,9 @@ function connectElgatoStreamDeckSocket(inPort, inPluginUUID, inRegisterEvent, in
                 else if (action == 'com.temp.openhab.switch') {
                     actions[context] = new ActionSwitch(context, action, settings, coordinates, openHabConnector);
                 }
+                else if (action == 'com.temp.openhab.button') {
+                    actions[context] = new ActionButton(context, action, settings, coordinates, openHabConnector);
+                }
             }
         }
         else if (event == 'willDisappear') {

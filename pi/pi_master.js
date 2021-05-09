@@ -98,6 +98,9 @@ function MasterPI (inContext, inLanguage) {
         if (instance instanceof PI_Switch) {
             action = "com.temp.openhab.switch";
         }
+        if (instance instanceof PI_Button) {
+            action = "com.temp.openhab.button";
+        }
 
         return action;
     }
