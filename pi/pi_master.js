@@ -105,8 +105,12 @@ function MasterPI (inContext, inLanguage) {
         return action;
     }
 
-    this.setSettings = function () {
+    this.setSettings = function (subPayload) {
         var newSettings = {};
+
+        if (subPayload != null) {
+           newSettings.openhab_config = subPayload;
+        }       
 
         var itemSelect = document.getElementById('server_select');
 
@@ -185,6 +189,8 @@ function MasterPI (inContext, inLanguage) {
         OpenhabItemHelerLastSelect = openhab_item;
         var opt = document.getElementById('openhab_item').value=openhab_item;
         opt.selected = 'selected';
+
+        //handle subButton Settings
     }
 }
 
