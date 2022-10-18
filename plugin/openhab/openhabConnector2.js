@@ -1,28 +1,18 @@
-class OpenHabConnector2 {
-    host;
-    baseUrl;
-
+class OpenHabServer {
     itemsToListen = [];
     openHabEventSource = null;
 
-    constructor () {
+    constructor(uuid, protocol, url, name) {
+        this.uuid = uuid;
+        this.protocol = protocol;
+        this.url = url;
+        this.name = name;
+
         this._events = {};
     }
 
-    RegisterServer(url) {
-        if (url == this.host) {
-            console.log("Server allready registred");
-            return;
-        }
-
-        this.host = url;
-        this.baseUrl = url + "/rest/";
-    }
-
-    Close() {
-        if (this.openHabEventSource != null) {
-            this.openHabEventSource.close();
-        }
+    _baseURL() {
+        return this.protocol + "://" + this.url + "/rest/";
     }
 
     RegisterItemToSubscribe(item) {
@@ -46,47 +36,17 @@ class OpenHabConnector2 {
         this._refreshEventSubscriber();
     }
 
-    // EVENTS
-    on(name, listener) {
-        if (!this._events[name]) {
-          this._events[name] = [];
-        }
-    
-        this._events[name].push(listener);
-    }
-
-    removeListener(name, listenerToRemove) {
-        if (!this._events[name]) {
-          throw new Error(`Can't remove a listener. Event "${name}" doesn't exits.`);
-        }
-    
-        const filterListeners = (listener) => listener !== listenerToRemove;
-    
-        this._events[name] = this._events[name].filter(filterListeners);
-      }
-
-    emit(name, data) {
-        if (!this._events[name]) {
-          throw new Error(`Can't emit an event. Event "${name}" doesn't exits.`);
-        }
-    
-        const fireCallbacks = (callback) => {
-            var obj = JSON.parse(data);
-            var payload = JSON.parse(obj.payload);
-              
-            callback(payload);
-        };
-    
-        this._events[name].forEach(fireCallbacks);
-    }  
-
     _refreshEventSubscriber() {
         if (this.openHabEventSource != null) {
             this.openHabEventSource.close();
         }
 
+        if ( this.itemsToListen.length == 0) {
+            return;
+        }
+
         var self = this;
-        var queryURL = this.baseUrl + 'events?topics=';
+        var queryURL = this._baseURL() + 'events?topics=';
 
         this.itemsToListen.forEach((element) => {
             queryURL = queryURL + 'smarthome/items/' + element + '/statechanged,';
@@ -96,14 +56,14 @@ class OpenHabConnector2 {
         
 
         this.openHabEventSource = new EventSource(queryURL, { ithCredentials: false });
-        this.openHabEventSource.addEventListener('message', function(e) {
+        this.openHabEventSource.addEventListener('message', function(e, uuid) {
             //console.log(e.data);
-            self.emit('ItemStatusChanged', e.data);
+            self.emit('ItemStatusChanged', new OpenHabItemChangedEvent(self.uuid, e.data));
         }, false);
     }
 
-    GetAvailableItems(itemType = ITEM_TYPE) {
-        var queryURL = this.baseUrl + "items?";
+    GetAvailableItems(uuid, itemType = ITEM_TYPE) {
+        var queryURL = this._baseURL() + "items?";
 
         switch (itemType) {
             case ITEM_TYPE.NONE:
@@ -140,7 +100,7 @@ class OpenHabConnector2 {
     }
 
     async GetCurrentStatus(item) {   // change this to promise 
-        const response = await fetch(this.baseUrl + "items/" + item);
+        const response = await fetch(this._baseURL() + "items/" + item);
         const responseJson = await response.json();
 
         return responseJson;
@@ -149,7 +109,7 @@ class OpenHabConnector2 {
     // ToDo do nicer error handling
     SendCommandToItem(item, command) {
         new Promise((resolove, reject) => {
-            fetch(this.baseUrl + 'items/' + item, {
+            fetch(this._baseURL() + 'items/' + item, {
                 method: 'post',
                 body: command
             })
@@ -174,8 +134,174 @@ class OpenHabConnector2 {
         })
     } 
 
-    get Server() {
-        return this.host;
+    // EVENTS
+    on(name, listener) {
+        if (!this._events[name]) {
+          this._events[name] = [];
+        }
+    
+        this._events[name].push(listener);
+    }
+
+    removeListener(name, listenerToRemove) {
+        if (!this._events[name]) {
+          throw new Error(`Can't remove a listener. Event "${name}" doesn't exits.`);
+        }
+    
+        const filterListeners = (listener) => listener !== listenerToRemove;
+    
+        this._events[name] = this._events[name].filter(filterListeners);
+      }
+
+    emit(name, data) {
+        if (!this._events[name]) {
+          throw new Error(`Can't emit an event. Event "${name}" doesn't exits.`);
+        }
+    
+        const fireCallbacks = (callback) => {          
+              
+            callback(data);
+        };
+    
+        this._events[name].forEach(fireCallbacks);
+    }
+}
+
+
+class OpenHabItemChangedEvent {
+    constructor(uuid, payload) {
+        this.uuid = uuid;
+        this.payload = payload;
+    }
+}
+
+
+
+
+
+
+
+class OpenHabConnector2 {
+    _serverList = [];
+    
+    constructor () {
+        this._events = {};
+    }
+
+    RegisterServer(uuid, proticol, url, name) {
+
+        if ((uuid in this._serverList)) {
+            console.log("Server allready registred");
+            return;
+        }
+
+        var self = this;
+
+        var server = new OpenHabServer(uuid, proticol, url, name);
+        server.on('ItemStatusChanged', function (data)  {
+
+            console.log("NEW ITEM CHANGED FROM: " + data.uuid);        
+            self.emit(data.uuid + "_ItemChanged", data.payload);
+
+        }, false);
+        this._serverList[uuid] = server;
+    }
+
+    DeregisterServer(removeUUID) {
+       if ( (removeUUID in this._serverList) ) {
+           this._serverList[removeUUID].removeListener(this._handleMessagesFromOpenHabserver);
+            delete this._serverList[removeUUID];
+       }
+    }
+
+    Close() {
+        if (this.openHabEventSource != null) {
+            this.openHabEventSource.close();
+        }
+    }
+
+    AddItemListener(uuid, item) {
+        this._serverList[uuid].RegisterItemToSubscribe(item);
+    }
+
+    RemoveItemListener (uuid, item) {
+        this._serverList[uuid].DeregisterItemToSubscribe(item);
+    }
+
+    _handleMessagesFromOpenHabserver(event) {
+        
+    }
+
+    CheckServerIsRegestrated (uuid) {
+        if (uuid in this._serverList) {
+            return true;
+        }
+        return false;        
+    }
+    
+
+    // EVENTS
+    on(name, listener) {
+        if (!this._events[name]) {
+          this._events[name] = [];
+        }
+    
+        this._events[name].push(listener);
+    }
+
+    removeListener(name, listenerToRemove) {
+        if (!this._events[name]) {
+          throw new Error(`Can't remove a listener. Event "${name}" doesn't exits.`);
+        }
+    
+        const filterListeners = (listener) => listener !== listenerToRemove;
+    
+        this._events[name] = this._events[name].filter(filterListeners);
+      }
+
+    emit(name, data) {
+        if (!this._events[name]) {
+          throw new Error(`Can't emit an event. Event "${name}" doesn't exits.`);
+        }
+    
+        const fireCallbacks = (callback) => {            
+              
+            callback(data);
+        };
+    
+        this._events[name].forEach(fireCallbacks);
+    }     
+
+    GetAvailableItems(uuid, itemType = ITEM_TYPE) {        
+
+        return new Promise((resolove, reject) => {
+            this._serverList[uuid].GetAvailableItems(itemType)
+            .then((data) => {
+                resolove(data);
+            })
+            .catch((error) => {
+                console.log('Error: ' , error);
+                reject(error);
+            })
+        })
+        
+
+    }
+
+    async GetCurrentStatus(uuid, item) {   // change this to promise 
+        console.log("TEST");
+         var data =  await this._serverList[uuid].GetCurrentStatus(item);
+         return data;
+    }
+
+    // ToDo do nicer error handling
+    SendCommandToItem(uuid, item, command) {
+        //Call the right UUID connection
+        this._serverList[uuid].SendCommandToItem(item, command);
+    }    
+
+    get Servers() {
+        return this._serverList;
     }
 
 };
