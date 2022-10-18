@@ -51,8 +51,8 @@ function Action(inAction, inContext, settings, coordinates, openhabConnector) {
     const handleOpenHabEvent = (data) => {
         var obj = JSON.parse(data);
                
-        var myRegexp =  RegExp("^(smarthome\/items\/(\w+)\/statechanged)$");
-        const regexpWithoutE = /smarthome\/items\/(\w+)\/statechanged/;
+        var myRegexp =  RegExp("^(openhab\/items\/(\w+)\/statechanged)$");
+        const regexpWithoutE = /openhab\/items\/(\w+)\/statechanged/;
         var match = obj.topic.match(regexpWithoutE);
 
         if (match[1] == settingsCache.openhab_item) {
