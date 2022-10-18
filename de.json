@@ -1,8 +1,16 @@
 {
-  "Description": "Openhab Connector", 
+  "Description": "Das openHAB System mit dem StreamDeck steuern", 
   "Name": "OpenHAB", 
-  "com.temp.openhab.action": {
-    "Name": "OpenHAB", 
-    "Tooltip": "Connector"
+  "com.temp.openhab.switch": {
+    "Name": "Switch", 
+    "Tooltip": "Schalter"
+  },
+  "com.temp.openhab.button": {
+    "Name": "Button", 
+    "Tooltip": "Sendet einen angegebenen Wert."
+  },
+  "com.temp.openhab.lable": {
+    "Name": "Lable", 
+    "Tooltip": "Zeigt den Wert einen Items an."
   }
 }
