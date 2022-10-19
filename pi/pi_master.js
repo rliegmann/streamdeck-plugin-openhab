@@ -137,6 +137,19 @@ function MasterPI (inContext, inLanguage) {
     function setAvailableItems(data) {
         console.log("getAvailableItemsResponse:   " + JSON.stringify(data.data));
 
+        data.data.sort((a, b) => {
+            let fa = a.name.toLowerCase(),
+                fb = b.name.toLowerCase();
+        
+            if (fa < fb) {
+                return -1;
+            }
+            if (fa > fb) {
+                return 1;
+            }
+            return 0;
+        });
+
         var select = document.getElementById('openhab_item');
         removeOptions(select);
 
