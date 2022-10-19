@@ -57,10 +57,10 @@ function connectElgatoStreamDeckSocket(inPort, inPluginUUID, inRegisterEvent, in
             var coordinates = jsonPayload['coordinates'];
 
             if (!(context in actions)) {
-                if(action == 'com.temp.openhab.lable') {
+                if(action == 'com.rliegmann.openhab.lable') {
                     actions[context] = new ActionLable(context, action, settings, coordinates, openHabConnector);
                 }
-                else if (action == 'com.temp.openhab.switch') {
+                else if (action == 'com.rliegmann.openhab.switch') {
                     actions[context] = new ActionSwitch(context, action, settings, coordinates, openHabConnector);
                 }
             }

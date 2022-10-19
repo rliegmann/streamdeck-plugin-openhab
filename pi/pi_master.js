@@ -93,10 +93,10 @@ function MasterPI (inContext, inLanguage) {
         var action
 
         if (instance instanceof PI_Lable) {
-            action = "com.temp.openhab.lable";
+            action = "com.rliegmann.openhab.lable";
         }
         if (instance instanceof PI_Switch) {
-            action = "com.temp.openhab.switch";
+            action = "com.rliegmann.openhab.switch";
         }
 
         return action;

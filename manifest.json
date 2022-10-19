@@ -18,7 +18,7 @@
       "PropertyInspectorPath": "pi/index.html", 
       "SupportedInMultiActions": true,
       "Tooltip": "Simple switch that changes between ON / OFF depending on the previous status.", 
-      "UUID": "com.temp.openhab.switch"
+      "UUID": "com.rliegmann.openhab.switch"
     },
     {
       "Icon": "pluginIcon", 
@@ -33,7 +33,7 @@
       "PropertyInspectorPath": "openhabButton_PI.html",
       "SupportedInMultiActions": true,
       "Tooltip": "Simple button that sends the specified property.", 
-      "UUID": "com.temp.openhab.button"
+      "UUID": "com.rliegmann.openhab.button"
     },
     {
       "Icon": "pluginIcon",
@@ -47,7 +47,7 @@
       ],
       "PropertyInspectorPath": "pi/index.html",
       "Tooltip": "Simple display of the status",
-      "UUID": "com.temp.openhab.lable"
+      "UUID": "com.rliegmann.openhab.lable"
     }
   ], 
   "SDKVersion": 2,
