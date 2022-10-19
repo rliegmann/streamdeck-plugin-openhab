@@ -2,7 +2,7 @@
   "Actions": [
     {
       "Icon": "pluginIcon", 
-      "Name": "Switch", 
+      "Name": "Switch (ON/OFF)", 
       "States": [
         {
           "Image": "icons/switch_off",
