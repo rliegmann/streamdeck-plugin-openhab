@@ -2,7 +2,7 @@
   "Actions": [
     {
       "Icon": "pluginIcon", 
-      "Name": "Switch", 
+      "Name": "Switch (ON/OFF)", 
       "States": [
         {
           "Image": "icons/switch_off",
@@ -18,7 +18,7 @@
       "PropertyInspectorPath": "pi/index.html", 
       "SupportedInMultiActions": true,
       "Tooltip": "Simple switch that changes between ON / OFF depending on the previous status.", 
-      "UUID": "com.temp.openhab.switch"
+      "UUID": "com.rliegmann.openhab.switch"
     },
     {
       "Icon": "pluginIcon", 
@@ -33,7 +33,7 @@
       "PropertyInspectorPath": "openhabButton_PI.html",
       "SupportedInMultiActions": true,
       "Tooltip": "Simple button that sends the specified property.", 
-      "UUID": "com.temp.openhab.button"
+      "UUID": "com.rliegmann.openhab.button"
     },
     {
       "Icon": "pluginIcon",
@@ -47,17 +47,17 @@
       ],
       "PropertyInspectorPath": "pi/index.html",
       "Tooltip": "Simple display of the status",
-      "UUID": "com.temp.openhab.lable"
+      "UUID": "com.rliegmann.openhab.lable"
     }
   ], 
   "SDKVersion": 2,
-  "Author": "Elgato",   
+  "Author": "R.L.",   
   "CodePath": "plugin/index.html",
-  "Description": "Track the number of times you press a key.", 
-  "Name": "Counter", 
+  "Description": "Control openHAB with StreamDeck.", 
+  "Name": "openHAB", 
   "Icon": "pluginIcon", 
-  "URL": "https://www.elgato.com/gaming/stream-deck", 
-  "Version": "1.4",
+  "URL": "https://github.com/rliegmann/streamdeck-plugin-openhab", 
+  "Version": "1.0",
   "Category": "OpenHAB",
   "CategoryIcon": "pluginIcon",
   "OS": [

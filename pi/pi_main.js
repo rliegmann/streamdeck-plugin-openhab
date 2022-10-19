@@ -31,10 +31,10 @@ function connectElgatoStreamDeckSocket(inPort, inUUID, inRegisterEvent, inInfo, 
 
     var pi;
 
-    if (action === 'com.temp.openhab.lable') {
+    if (action === 'com.rliegmann.openhab.lable') {
         pi = new PI_Lable(inUUID, language);
     }
-    if (action === 'com.temp.openhab.switch') {
+    if (action === 'com.rliegmann.openhab.switch') {
         pi = new PI_Switch(inUUID, language);
     }
 

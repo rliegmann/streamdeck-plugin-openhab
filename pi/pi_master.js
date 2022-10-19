@@ -93,10 +93,10 @@ function MasterPI (inContext, inLanguage) {
         var action
 
         if (instance instanceof PI_Lable) {
-            action = "com.temp.openhab.lable";
+            action = "com.rliegmann.openhab.lable";
         }
         if (instance instanceof PI_Switch) {
-            action = "com.temp.openhab.switch";
+            action = "com.rliegmann.openhab.switch";
         }
 
         return action;
@@ -136,6 +136,19 @@ function MasterPI (inContext, inLanguage) {
 
     function setAvailableItems(data) {
         console.log("getAvailableItemsResponse:   " + JSON.stringify(data.data));
+
+        data.data.sort((a, b) => {
+            let fa = a.name.toLowerCase(),
+                fb = b.name.toLowerCase();
+        
+            if (fa < fb) {
+                return -1;
+            }
+            if (fa > fb) {
+                return 1;
+            }
+            return 0;
+        });
 
         var select = document.getElementById('openhab_item');
         removeOptions(select);

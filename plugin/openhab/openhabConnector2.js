@@ -49,7 +49,7 @@ class OpenHabServer {
         var queryURL = this._baseURL() + 'events?topics=';
 
         this.itemsToListen.forEach((element) => {
-            queryURL = queryURL + 'smarthome/items/' + element + '/statechanged,';
+            queryURL = queryURL + 'openhab/items/' + element + '/statechanged,';
         });
 
         console.log(queryURL);
