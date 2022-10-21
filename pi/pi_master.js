@@ -12,9 +12,15 @@ function MasterPI (inContext, inLanguage) {
     document.getElementById('button_delete').addEventListener('click', pressedDeleteServer);
     document.getElementById('server_select').addEventListener('change', serverChanged2);
 
+    document.getElementById('title').addEventListener('blur', titleTemplateChanged);
+
     function serverChanged(inEvent) {
         instance.setSettings();
         instance.getAvailableItems();
+    }
+
+    function titleTemplateChanged(inEvent) {
+        instance.setSettings();
     }
 
     function serverChanged2(inEvent) {
@@ -109,6 +115,8 @@ function MasterPI (inContext, inLanguage) {
 
         newSettings.openhab_server = itemSelect.options[itemSelect.selectedIndex].value;
         newSettings.openhab_item = document.getElementById('openhab_item').value;
+       
+        newSettings.title_template = document.getElementById("title").value;
 
         SendSettings(getCurrentAction(), inContext, newSettings);
     }
@@ -187,6 +195,7 @@ function MasterPI (inContext, inLanguage) {
         console.log("requestSettingsResponse:   " + JSON.stringify(data));
         var openhab_server = data.openhab_server;
         var openhab_item = data.openhab_item;
+        var title_template = data.title_template;
 
         var server_opt = document.getElementById("server_select").value = openhab_server;
         server_opt.selected = 'selected';
@@ -195,6 +204,8 @@ function MasterPI (inContext, inLanguage) {
         OpenhabItemHelerLastSelect = openhab_item;
         var opt = document.getElementById('openhab_item').value=openhab_item;
         opt.selected = 'selected';
+
+        document.getElementById('title').value = title_template;
     }
 }
 
