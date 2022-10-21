@@ -234,6 +234,20 @@ function Action(inAction, inContext, settings, coordinates, openhabConnector) {
         }
     }
 
+    this.ProcessTitleTemplate = function(data) {
+        var dataToSend = data;
+        if (this.Settings.title_template != "") {
+            var replacements = {
+                "%VALUE%": data                
+            },
+            dataToSend = this.Settings.title_template;
+            dataToSend = dataToSend.replace(/%\w+%/g, function(all) {
+                return replacements[all] || all;
+            });
+        }
+        return dataToSend
+    }
+
     this.SetSettings = function() {
         if(websocket) {
             var json = {
