@@ -58,10 +58,12 @@ function ActionLable (inContext, inAction, inSettings, coordinates, openhabConne
     }
 
     const handleOnItemStateChanged = (data) => {
-        console.log('Was fired: ', data);
+        console.log('Was fired: ', data); 
+        
+        data = instance.ProcessTitleTemplate(data.value);
                 
         var payload = {            
-                title: data.value,
+                title: data,
                 target: STREAM_DECK_TARGET_TYPE.BOTH,
                 state: 0
             };

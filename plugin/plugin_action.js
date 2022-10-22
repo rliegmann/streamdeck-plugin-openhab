@@ -1,6 +1,7 @@
 let initConfig = {
     openhab_server: "---",
     openhab_item: "---",
+    title_template: "",
 };
 
 class ActionItemChangedEvent {
@@ -34,7 +35,8 @@ function Action(inAction, inContext, settings, coordinates, openhabConnector) {
                                 openhab_item: '---'}; 
 
     settingsCache = { openhab_server: initConfig.openhab_server,
-                        openhab_item: initConfig.openhab_item}; // Deep copy!!
+                        openhab_item: initConfig.openhab_item,
+                        title_template: initConfig.title_template}; // Deep copy!!
 
     if (Object.keys(settings).length === 0) {
         console.log("Init Action");
@@ -45,6 +47,9 @@ function Action(inAction, inContext, settings, coordinates, openhabConnector) {
     }
     if (settings.hasOwnProperty('openhab_item')) {
         settingsCache.openhab_item = settings["openhab_item"];
+    }
+    if (settings.hasOwnProperty('title_template')) {
+        settingsCache.title_template = settings["title_template"];
     }
 
   
@@ -229,6 +234,20 @@ function Action(inAction, inContext, settings, coordinates, openhabConnector) {
         }
     }
 
+    this.ProcessTitleTemplate = function(data) {
+        var dataToSend = data;
+        if (this.Settings.title_template != "") {
+            var replacements = {
+                "%VALUE%": data                
+            },
+            dataToSend = this.Settings.title_template;
+            dataToSend = dataToSend.replace(/%\w+%/g, function(all) {
+                return replacements[all] || all;
+            });
+        }
+        return dataToSend
+    }
+
     this.SetSettings = function() {
         if(websocket) {
             var json = {
@@ -256,6 +275,7 @@ function Action(inAction, inContext, settings, coordinates, openhabConnector) {
                     await this.RefreshOpenhabConnection();
             }
             previousSettingsCache = settingsCache;
+            settingsCache = value;
             this.SetSettings();
         }
         //writable: false, //if we need it to be read-only

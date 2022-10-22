@@ -1,5 +1,8 @@
 <head>
     <meta charset="utf-8" />
+    <meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no,minimal-ui,viewport-fit=cover"> 
+    <meta name=apple-mobile-web-app-capable content=yes>
+    <meta name=apple-mobile-web-app-status-bar-style content=black> 
     <title>com.rliegmann.openhab.pi</title>
     <link rel="stylesheet" href="sdpi.css">
 
@@ -13,30 +16,116 @@
 <body>
     <div class="sdpi-wrapper">
         <div class="sdpi-heading">Main Settings</div>
-        <!--  OpenHAB  Server-->
-        <div class="sdpi-item" id="select_single">
-            <div class="sdpi-item-label">OpenHAB Server</div>
-            <select class="sdpi-item-value select" id="server_select">               
-                <option value="noServer">no Server</option>
-            </select>
-        </div>       
+        <!--<div type="group" class="sdpi-item" id="messagegroup">-->
 
+            <!--<div class="sdpi-item-label empty">Main Settings</div>-->
+
+            <!--<div class="sdpi-item-group" id="messagegroup_items">-->
+                <div class="sdpi-item" >
+                    <div class="sdpi-item-label">openHAB Server</div>
+                        <select class="sdpi-item-value " id="server_select" style="min-width: 150px; max-width: 150;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">               
+                            <option value="noServer">no Server</option>
+                        </select>                    
+                <!--</div>-->
+                <!--<div class="sdpi-item">
+                    <div class="sdpi-item-label empty"></div>  -->          
+                    <button id="button_new" class="sdpi-item-value" style="margin-right: 8px;">&#10010;</button>
+                    <button id="button_edit" class="sdpi-item-value" style="margin-right: 8px;">&#9998;</button>
+                    <button id="button_delete" class="sdpi-item-value" style="margin-right: 8px;">&#10007;</button>
+                </div>
+                
+                <!--
+                <div class="sdpi-item" id="your_name">
+                    <div class="sdpi-item-label">Name</div>
+                    <input class="sdpi-item-value" id="mynameinput" value="">
+                </div>
+                -->
+               
+            
+            
+                <div class="sdpi-item">
+                    <div class="sdpi-item-label">Item</div> 
+                    <select class="sdpi-item-value select" id="openhab_item" style="min-width: 230px; max-width: 230px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;  margin-right: 5px;">
+                    <!--<select class="sdpi-item-value select" id="openhab_item"></select>-->
+                        <option selected="selected" value="---">---</option>
+                    </select> 
+                    <button id="openhab_item_refresh" class="sdpi-item-value " >&#8635;</button>
+                </div> 
+                
+                <!--
+                <div class="sdpi-item" id="message_only">
+                    <div class="sdpi-item-label">Title Templ</div>
+                    <input type="text" class="sdpi-item-value" id="myemail" value="" placeholder="OPTIONAL: Modify the Title with valus">
+                </div>
+                -->
+                
+                <!--
+                <div class="sdpi-item" id="message_only">
+                    <div class="sdpi-item-label">Title Templ</div>
+                    <div class="sdpi-item-value textarea">
+                        <textarea type="textarea" maxlength="50" id="textarea11" style="min-height: 80px;" placeholder="OPTIONAL: &#10;Modify the Title with valus"></textarea>     
+                    </div>
+                   
+                </div>
+                -->
+                <!--
+                <div class="sdpi-item" id="message_only">
+                    <div class="sdpi-item-label">Title Templ</div>
+                    <div class="sdpi-item-value textarea">
+                        <textarea type="textarea" maxlength="50" id="textarea11"  placeholder="OPTIONAL: &#10;Modify the Title with valus"></textarea>     
+                    </div>
+                   
+                </div>
+                -->
+                <div class="sdpi-item list">
+                    <div class="sdpi-item-label">Title with Values</div>     
+                    <details class="sdpi-item-value">
+                        <summary>Click to config</summary>
+                        <div class="sdpi-item" id="message_only">
+                            <div class="sdpi-item-value textarea">
+                                <textarea type="textarea" maxlength="50" id="title" style="min-height: 80px;" placeholder="OPTIONAL: &#10;Modify the Title with valus"></textarea>     
+                            </div>
+                        
+                        </div>
+                        <div class="sdpi-item-value">
+                            <p>The title can be displayed with a custom text and the current value. <br> Use the placeholder %VALUE% for the value.</p>
+                        </div>
+                    </details>
+                </div>
+
+
+
+            <!--</div> -->
+                
+
+        <!--</div>-->
+
+        <div class="sdpi-heading">Specific Settings</div>
+        
+        <!--
         <div class="sdpi-item">
-            <div class="sdpi-item-label"></div>            
-            <button id="button_new" class="sdpi-item-value">New</button>
-            <button id="button_edit" class="sdpi-item-value">Edit</button>
-            <button id="button_delete" class="sdpi-item-value">Delete</button>
-       </div>
+            <div class="sdpi-item-label">Select</div>
+            <select class="sdpi-item-value select">
+                <optgroup label="Women">
+                    <option value="janedoe@example.com">Item WorkTableEnergy changed from 250.986 kWh to 250.987 kWh</option>
+                    <option value="janedoe@example.com">Jane Doe</option>
+                    <option value="tinatank@example.com">Some Girl</option>
+                    <option value="yoko@example.com">Yoko Hama</option>
+                </optgroup>
+                <optgroup label="Men">
+                    <option value="johndoe@example.com">John Doe</option>
+                    <option value="tiptronic@example.com">Some Man</option>
+                    <option value="kingofprawns@example.com">Another Chap</option>
+                </optgroup>
 
-       <hr>       
+            </select>
+        </div>
 
-        <!-- OpenHAB  Item-->
-        <div class="sdpi-item" id="select_single">
-            <div class="sdpi-item-label">Item</div> 
-            <select class="sdpi-item-value select" id="openhab_item" style="width: 170px">
-                <option selected="selected" value="---">---</option>
-            </select> 
-            <button id="openhab_item_refresh" class="sdpi-item-value max10" value="Click Me only">&#8635;</button>
-       </div>
-    <div>
+        <div class="sdpi-item" id="your_name_required" title="This field lets you enter an IP-Adress. The little exclamation mark changes to a checkmark, if the condition is met (e.g. you entered an IP-address.).">
+            <div class="sdpi-item-label">IP-Address</div>
+            <input class="sdpi-item-value" id="myrequirednameinput" value="" placeholder="e.g. 192.168.61.1" required pattern="\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}">
+        </div>
+        -->
+
+    </div>  
 </body>
