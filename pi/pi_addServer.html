@@ -16,18 +16,18 @@
 </div>
 
 <div style=" text-align: center; margin-left: auto;">
-    <input id="input_name" style="height: 50px; min-height: 50px;  font-size: large;" type="text" value="Name">
+    <input id="input_name" style="height: 50px; min-height: 50px; width: 320px;; font-size: large; padding: 0.5em;" type="text" placeholder="Name" value="Server1">
 </div>
 
 <div style=" text-align: center; margin-left: auto;">
-    <select id="select_protocoll" style="height: 50px; min-height: 50px; min-width: 50px; font-size: large;">
-        <option selected="selected" value="http">http</option>
-        <option value="https">https</option>
+    <select id="select_protocoll" style="height: 50px; min-height: 50px; min-width: 50px; font-size: large; padding: 0.5em;">
+        <option selected="selected" value="http">http:</option>
+        <option value="https">https:</option>
     </select>
-    <input  id="input_url"  style="height: 50px; min-height: 50px; min-width: 50px; font-size: large;" type="text" value="openhab:8080">
-    </div>
+    <input  id="input_url"  style="height: 50px; min-height: 50px; min-width: 250px; font-size: large;  padding: 0.5em;" type="text" placeholder="openhab:8080" value="openhab:8080">
+</div>
 
-<div style="text-align: center;">
+<div style="text-align: center; min-height: 50px;">
     <span id="span_checkOK" style="height: 50px; min-height: 50px; min-width: 50px; font-size: large;"></span>
 
 </div>
@@ -36,7 +36,9 @@
 <div style=" text-align: center; margin-left: auto; margin-top: 1%">
     <button id="button_check" style="text-align: center; margin-left: auto; width: 80px;" value="Check">Check</button>
 
-    <button id="button_add" style="text-align: center; margin-left: auto; width: 80px;" disabled >Hinzufügen</button>
+    <button id="button_add" style="text-align: center; margin-left: auto; width: 80px;" disabled >Add</button>
+
+    <button id="button_abord"style="text-align: center; margin-left: auto; width: 80px;" >Back</button>
 </div>
 
 

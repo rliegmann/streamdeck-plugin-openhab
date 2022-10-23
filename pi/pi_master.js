@@ -14,6 +14,8 @@ function MasterPI (inContext, inLanguage) {
 
     document.getElementById('title').addEventListener('blur', titleTemplateChanged);
 
+    document.addEventListener("saveOpenHabServer", saveOpenHabServerCallback);
+
     function serverChanged(inEvent) {
         instance.setSettings();
         instance.getAvailableItems();
@@ -49,12 +51,30 @@ function MasterPI (inContext, inLanguage) {
                 SetGlobalSettings(inContext);
                 instance.handleGlobalSettings();
 
-            window.removeEventListener('message', this, true);
+            this.window.removeEventListener('message', this, true);
         }, false);
     }
 
+    function saveOpenHabServerCallback(inEvent) {
+        console.log("Handle new Server from NewServer Page");
+        if (gSettings.servers === undefined) {
+                gSettings.servers = {};
+        }
+        var newSettings = inEvent.detail;       
+        gSettings.servers[newSettings.uuid] = {
+                protocoll: newSettings.protocoll,
+                url: newSettings.url,
+                name: newSettings.name,
+        }
+        SetGlobalSettings(inContext);
+        instance.handleGlobalSettings();
+
+    }
+
     function pressedDeleteServer(event) {
-        gSettings.servers = {};
+        var UuidToDelete = document.getElementById('server_select');
+
+        //gSettings.servers = {};
         SetGlobalSettings(inContext);
     }
 
