@@ -12,8 +12,11 @@ function isUUID ( uuid ) {
 
 window.onload = function(data) {
     var serverUUID = null;
+    var dataToSend = null;
     console.log(data);
     document.getElementById('button_check').addEventListener('click', check);
+    document.getElementById('button_add').addEventListener('click', add);
+    document.getElementById('button_abord'). addEventListener('click', aboard)
 
     function check() {
         var protocol = document.getElementById('select_protocoll');
@@ -51,7 +54,7 @@ window.onload = function(data) {
 
     function checkOK() {
         var span = document.getElementById('span_checkOK');
-        span.style.color = "#90FF33"; //RED
+        span.style.color = "#90FF33"; //GREEN
         span.innerHTML = "OK";
 
         var button = document.getElementById('button_add');
@@ -61,17 +64,16 @@ window.onload = function(data) {
         var prot = document.getElementById('select_protocoll').value;
         var url = document.getElementById('input_url').value;
 
-        var dataToSend = {
+        dataToSend = {
             detail: {
                 name: name,
                 uuid: serverUUID,
                 protocoll: prot,
                 url: url
             }
-        };
+        };    
 
-        var event = new CustomEvent("saveOpenHabServer", dataToSend);
-        window.opener.document.dispatchEvent(event);
+       // add(dataToSend)
         /*
         window.opener.postMessage(
             {
@@ -92,5 +94,15 @@ window.onload = function(data) {
 
         var button = document.getElementById('button_add');
         button.disabled = true;
+    }
+
+    function add() {
+        var event = new CustomEvent("saveOpenHabServer", dataToSend);
+        window.opener.document.dispatchEvent(event);
+        window.open('','_self').close();
+    }
+
+    function aboard() {
+        window.open('','_self').close();
     }
 }
