@@ -72,10 +72,15 @@ function MasterPI (inContext, inLanguage) {
     }
 
     function pressedDeleteServer(event) {
-        var UuidToDelete = document.getElementById('server_select');
+        var UuidToDelete = getCurrentServer();
 
+        //if (window.gSettings.servers.includes(UuidToDelete)) {
+            if (Object.keys(gSettings.servers).some(key => key === UuidToDelete)) {
+           delete gSettings.servers[UuidToDelete];
+        }
         //gSettings.servers = {};
         SetGlobalSettings(inContext);
+        instance.handleGlobalSettings();
     }
 
     this.handleGlobalSettings = function() {
@@ -128,12 +133,17 @@ function MasterPI (inContext, inLanguage) {
         return action;
     }
 
+    function getCurrentServer() {
+        var itemSelect = document.getElementById('server_select');
+        return itemSelect.options[itemSelect.selectedIndex].value;
+    }
+
     this.setSettings = function () {
         var newSettings = {};
 
         var itemSelect = document.getElementById('server_select');
 
-        newSettings.openhab_server = itemSelect.options[itemSelect.selectedIndex].value;
+        newSettings.openhab_server = getCurrentServer();
         newSettings.openhab_item = document.getElementById('openhab_item').value;
        
         newSettings.title_template = document.getElementById("title").value;

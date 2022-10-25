@@ -209,8 +209,9 @@ class OpenHabConnector2 {
 
     DeregisterServer(removeUUID) {
        if ( (removeUUID in this._serverList) ) {
+           
            this._serverList[removeUUID].removeListener("ItemStatusChanged");
-            //delete this._serverList[removeUUID];
+            delete this._serverList[removeUUID];
        }
     }
 

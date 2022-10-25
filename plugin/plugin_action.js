@@ -110,7 +110,7 @@ function Action(inAction, inContext, settings, coordinates, openhabConnector) {
         }  
         
         if ( previousSettingsCache.openhab_server != settingsCache.openhab_server && previousSettingsCache.openhab_server != '---' ) {
-            OpenhabConnector.removeListener(previousSettingsCache.openhab_server +  '_ItemChanged');
+            //OpenhabConnector.removeListener(previousSettingsCache.openhab_server +  '_ItemChanged');
             return;
         }
 
@@ -269,12 +269,14 @@ function Action(inAction, inContext, settings, coordinates, openhabConnector) {
     Object.defineProperty(this, 'Settings', {
         get: function() { return settingsCache; },  //we can also use `return name;` if we don't use `name` input param for other purposes in our code
         set: async function(value) {
+            //previousSettingsCache = structuredClone(settingsCache);
+            previousSettingsCache = JSON.parse(JSON.stringify(settingsCache));
+
             if (value.openhab_server != settingsCache.openhab_server ||
                 value.openhab_item != settingsCache.openhab_item ) {
-                    settingsCache = value;
+                    settingsCache.openhab_server = value.openhab_server;
                     await this.RefreshOpenhabConnection();
-            }
-            previousSettingsCache = settingsCache;
+            }            
             settingsCache = value;
             this.SetSettings();
         }
@@ -285,6 +287,10 @@ function Action(inAction, inContext, settings, coordinates, openhabConnector) {
     Object.defineProperty(this, 'ItemState', {
         get: function() { return _currentItemState; }
     })
+
+    Object.defineProperty(this, 'Connector', {
+        get: function() {return OpenhabConnector.Servers;}
+    });
 
     if (!OpenhabConnector.CheckServerIsRegestrated(settingsCache.openhab_server)) {
         return;
