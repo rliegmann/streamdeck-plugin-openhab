@@ -63,6 +63,8 @@ function connectElgatoStreamDeckSocket(inPort, inPluginUUID, inRegisterEvent, in
                 else if (action == 'com.rliegmann.openhab.switch') {
                     actions[context] = new ActionSwitch(context, action, settings, coordinates, openHabConnector);
                 }
+            } else {
+                actions[context].RefreshOpenhabConnection();
             }
         }
         else if (event == 'willDisappear') {
@@ -71,8 +73,8 @@ function connectElgatoStreamDeckSocket(inPort, inPluginUUID, inRegisterEvent, in
 
             // Do close connections to all services for context
             if (context in actions) {
-                //actions[context].Stop();
-                //delete actions[context];
+                actions[context].Pause();
+                delete actions[context];
             }
         }
         else if (event == 'propertyInspectorDidAppear') {

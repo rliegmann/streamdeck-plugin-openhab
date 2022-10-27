@@ -16,9 +16,11 @@ class OpenHabServer {
     }
 
     RegisterItemToSubscribe(item) {
+        /*
         if (this.itemsToListen.includes(item)) {
             return;
         }
+        */
 
         this.itemsToListen.push(item);
 
@@ -198,12 +200,14 @@ class OpenHabConnector2 {
         var self = this;
 
         var server = new OpenHabServer(uuid, proticol, url, name);
+        /*
         server.on('ItemStatusChanged', function (data)  {
 
             console.log("NEW ITEM CHANGED FROM: " + data.uuid);        
             self.emit(data.uuid + "_ItemChanged", data.payload);
 
         }, false);
+        */
         this._serverList[uuid] = server;
     }
 
@@ -234,6 +238,10 @@ class OpenHabConnector2 {
             return true;
         }
         return false;        
+    }
+
+    GetServerWithUUID(uuid) {
+        return this._serverList[uuid];
     }
     
 
