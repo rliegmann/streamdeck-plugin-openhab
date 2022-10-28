@@ -110,32 +110,19 @@ function Action(inAction, inContext, settings, coordinates, openhabConnector) {
 
         if (settingsCache.openhab_server === '---'  && previousSettingsCache.openhab_server === '---') {
             return;
-        }  
-        
-        /*
-        //if ( previousSettingsCache.openhab_server != settingsCache.openhab_server && previousSettingsCache.openhab_server != '---' ) {
-        if ( previousSettingsCache.openhab_server != settingsCache.openhab_server && settingsCache.openhab_item != '---' ) {    // Use for create Button
-            //OpenhabConnector.removeListener(previousSettingsCache.openhab_server +  '_ItemChanged');
-            openhabServer.removeListener('ItemStatusChanged');
-            return;
-        }
-        */
-        
+        }    
+
         if ( previousSettingsCache.openhab_server = settingsCache.openhab_server && !isOpenHabInitialized ) {
             openhabServer = openhabConnector.GetServerWithUUID(settingsCache.openhab_server);
             openhabServer.on('ItemStatusChanged', handleOpenHabEvent);
             isOpenHabInitialized = true;
             //OpenhabConnector.on(settingsCache.openhab_server + '_ItemChanged', handleOpenHabEvent);
-        }
-        
-
+        }   
        
         if (settingsCache.openhab_item == "---") {            
            this.GetAvailableItems();
         }   
-        else {       
-            //var state = await OpenhabConnector.GetCurrentStatus(settingsCache.openhab_server, settingsCache.openhab_item);            
-
+        else {
             var state = await openhabServer.GetCurrentStatus(settingsCache.openhab_item);
             var item = {value: state.state}; // THIS is not the findale  Change this
             _currentItemState = item.value;
@@ -177,8 +164,7 @@ function Action(inAction, inContext, settings, coordinates, openhabConnector) {
         payload.type = "getAvailableItemsResponse";
         payload.failed = false;   // Change this in future
         
-        openhabServer.GetAvailableItems("---", type)
-        //OpenhabConnector.GetAvailableItems(settingsCache.openhab_server, type)
+        openhabServer.GetAvailableItems("---", type)       
         .then((data) => {
             data.forEach(function(entry) {
                 payload["data"].push( {name: entry["name"] } );

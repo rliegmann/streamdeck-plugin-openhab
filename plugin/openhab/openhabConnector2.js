@@ -203,15 +203,7 @@ class OpenHabConnector2 {
 
         var self = this;
 
-        var server = new OpenHabServer(uuid, proticol, url, name);
-        /*
-        server.on('ItemStatusChanged', function (data)  {
-
-            console.log("NEW ITEM CHANGED FROM: " + data.uuid);        
-            self.emit(data.uuid + "_ItemChanged", data.payload);
-
-        }, false);
-        */
+        var server = new OpenHabServer(uuid, proticol, url, name);        
         this._serverList[uuid] = server;
     }
 
@@ -314,46 +306,3 @@ class OpenHabConnector2 {
     }
 
 };
-
-
-//var client = new OpenHabConnector2();
-//client.RegisterServer("http://openhab:8080");
-
-/*
-var payload = {};
-payload.data = [];
-
-client.GetAvailableItems(ITEM_TYPE.SWITCH)
-        .then((data) => {
-            data.forEach(function(entry) {
-                payload["data"].push( {name: entry["name"] } );
-            })
-            console.log(payload);
-        })
-        .catch((error) => {
-            payload["data"].push( {error: error.message } );
-			payload.failed = true;console.log(payload);
-        }); 
-*/
-
-/*
-(async () => {
-    const data = await client.GetCurrentStatus("SchlafzimmerLight_SchlafzimmerLampe");
-    console.log(data);
-
-    client.SendCommandToItem("SchlafzimmerLight_SchlafzimmerLampe", "ON");
-
-    client.RegisterItemToSubscribe("HMSchreibtischHMPB2WM552OEQ0902101_1_PressShort");
-    client.RegisterItemToSubscribe("HMSchreibtischHMPB2WM552OEQ0902101_2_PressShort");
-
-
-    //client.DeregisterItemToSubscribe("HMSchreibtischHMPB2WM552OEQ0902101_1_PressShort");
-
-   client.on('ItemStatusChanged', function(data)  {
-    console.log(data);
-   });
-
-})();
-*/
-
-

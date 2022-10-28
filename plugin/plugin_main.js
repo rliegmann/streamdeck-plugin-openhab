@@ -97,14 +97,7 @@ function connectElgatoStreamDeckSocket(inPort, inPluginUUID, inRegisterEvent, in
                             
                             
                         }
-                    })
-                    /*
-                    actions.forEach ((act, index) => {
-                        if ( !(act.openHabConnector in openHabConnector.Servers)) {
-                            console.log("JAAAAAAAAAA zum löschen");
-                        }
-                      });
-                   */                   
+                    })              
                     openHabConnector.DeregisterServer(element);
                 }
             });
