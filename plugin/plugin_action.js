@@ -30,6 +30,8 @@ function Action(inAction, inContext, settings, coordinates, openhabConnector) {
     var isEventRegest = false;
     var isInitialized = false;
     var _currentItemState = null;
+    var openhabServer = null;
+    var isOpenHabInitialized = false;
 
     previousSettingsCache = { openhab_server: '---',
                                 openhab_item: '---'}; 
@@ -52,9 +54,10 @@ function Action(inAction, inContext, settings, coordinates, openhabConnector) {
         settingsCache.title_template = settings["title_template"];
     }
 
+    
   
     const handleOpenHabEvent = (data) => {
-        var obj = JSON.parse(data);
+        var obj = JSON.parse(data.payload);
                
         var myRegexp =  RegExp("^(openhab\/items\/(\w+)\/statechanged)$");
         const regexpWithoutE = /openhab\/items\/(\w+)\/statechanged/;
@@ -107,32 +110,29 @@ function Action(inAction, inContext, settings, coordinates, openhabConnector) {
 
         if (settingsCache.openhab_server === '---'  && previousSettingsCache.openhab_server === '---') {
             return;
-        }  
-        
-        if ( previousSettingsCache.openhab_server != settingsCache.openhab_server && previousSettingsCache.openhab_server != '---' ) {
-            OpenhabConnector.removeListener(previousSettingsCache.openhab_server +  '_ItemChanged');
-            return;
-        }
+        }    
 
-        if ( previousSettingsCache.openhab_server != settingsCache.openhab_server ) {
-            OpenhabConnector.on(settingsCache.openhab_server + '_ItemChanged', handleOpenHabEvent);
-        }
-
+        if ( previousSettingsCache.openhab_server = settingsCache.openhab_server && !isOpenHabInitialized ) {
+            openhabServer = openhabConnector.GetServerWithUUID(settingsCache.openhab_server);
+            openhabServer.on('ItemStatusChanged', handleOpenHabEvent);
+            isOpenHabInitialized = true;
+            //OpenhabConnector.on(settingsCache.openhab_server + '_ItemChanged', handleOpenHabEvent);
+        }   
        
-        if (settingsCache.openhab_item == "---") {
+        if (settingsCache.openhab_item == "---") {            
            this.GetAvailableItems();
         }   
         else {
-            var state = await OpenhabConnector.GetCurrentStatus(settingsCache.openhab_server, settingsCache.openhab_item);
+            var state = await openhabServer.GetCurrentStatus(settingsCache.openhab_item);
             var item = {value: state.state}; // THIS is not the findale  Change this
             _currentItemState = item.value;
             emit("onItemStateChanged", new ActionItemChangedEcentPayload("-", item.value, "-", "-"));
 
             if ( previousSettingsCache.openhab_item != settingsCache.openhab_item ) {
-                OpenhabConnector.RemoveItemListener(settingsCache.openhab_server, previousSettingsCache.openhab_item);
-                OpenhabConnector.AddItemListener(settingsCache.openhab_server, settingsCache.openhab_item);  
+                openhabServer.DeregisterItemToSubscribe( previousSettingsCache.openhab_item );
+                openhabServer.RegisterItemToSubscribe( settingsCache.openhab_item );  
 
-                this.isInitialized = true;
+               this.isInitialized = true;
             }                
             
             
@@ -164,7 +164,7 @@ function Action(inAction, inContext, settings, coordinates, openhabConnector) {
         payload.type = "getAvailableItemsResponse";
         payload.failed = false;   // Change this in future
         
-        OpenhabConnector.GetAvailableItems(settingsCache.openhab_server, type)
+        openhabServer.GetAvailableItems("---", type)       
         .then((data) => {
             data.forEach(function(entry) {
                 payload["data"].push( {name: entry["name"] } );
@@ -180,7 +180,7 @@ function Action(inAction, inContext, settings, coordinates, openhabConnector) {
     }
 
     this.GetCurrentStatus = async function() {
-        return await OpenhabConnector.GetCurrentStatus(settingsCache.openhab_server, settingsCache.openhab_item);
+        return await openhabServer.GetCurrentStatus(settingsCache.openhab_item);
     }
 
     this.SendComandToItem = function(itemType, command) {
@@ -247,6 +247,16 @@ function Action(inAction, inContext, settings, coordinates, openhabConnector) {
         }
         return dataToSend
     }
+    this.SendCurrentItemStateToPI = function() {
+        data = this.ProcessTitleTemplate(this.ItemState);
+                
+        var payload = {            
+                title: data,
+                target: STREAM_DECK_TARGET_TYPE.BOTH,
+                state: 0
+            };
+        this.SetTitle(payload);
+    }
 
     this.SetSettings = function() {
         if(websocket) {
@@ -260,21 +270,26 @@ function Action(inAction, inContext, settings, coordinates, openhabConnector) {
         }
     }
 
-    this.Stop = function() {
-        OpenhabConnector.RemoveItemListener(settingsCache.openhab_server, settingsCache.openhab_item);
-        OpenhabConnector.removeListener(settingsCache.openhab_server + '_ItemChanged', handleOpenHabEvent);
+    this.Pause = function() {
+        if (openhabServer != null) {
+            openhabServer.DeregisterItemToSubscribe( settingsCache.openhab_item );
+            openhabServer.removeListener('ItemStatusChanged', handleOpenHabEvent);
+        }
     }   
     
 
     Object.defineProperty(this, 'Settings', {
         get: function() { return settingsCache; },  //we can also use `return name;` if we don't use `name` input param for other purposes in our code
         set: async function(value) {
+            //previousSettingsCache = structuredClone(settingsCache);
+            previousSettingsCache = JSON.parse(JSON.stringify(settingsCache));
+
             if (value.openhab_server != settingsCache.openhab_server ||
                 value.openhab_item != settingsCache.openhab_item ) {
-                    settingsCache = value;
+                    settingsCache.openhab_server = value.openhab_server;
+                    settingsCache.openhab_item = value.openhab_item;
                     await this.RefreshOpenhabConnection();
-            }
-            previousSettingsCache = settingsCache;
+            }            
             settingsCache = value;
             this.SetSettings();
         }
@@ -285,6 +300,10 @@ function Action(inAction, inContext, settings, coordinates, openhabConnector) {
     Object.defineProperty(this, 'ItemState', {
         get: function() { return _currentItemState; }
     })
+
+    Object.defineProperty(this, 'Connector', {
+        get: function() {return OpenhabConnector.Servers;}
+    });
 
     if (!OpenhabConnector.CheckServerIsRegestrated(settingsCache.openhab_server)) {
         return;

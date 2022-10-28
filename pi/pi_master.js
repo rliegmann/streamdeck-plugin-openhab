@@ -14,6 +14,8 @@ function MasterPI (inContext, inLanguage) {
 
     document.getElementById('title').addEventListener('blur', titleTemplateChanged);
 
+    document.addEventListener("saveOpenHabServer", saveOpenHabServerCallback);
+
     function serverChanged(inEvent) {
         instance.setSettings();
         instance.getAvailableItems();
@@ -49,13 +51,36 @@ function MasterPI (inContext, inLanguage) {
                 SetGlobalSettings(inContext);
                 instance.handleGlobalSettings();
 
-            window.removeEventListener('message', this, true);
+            this.window.removeEventListener('message', this, true);
         }, false);
     }
 
-    function pressedDeleteServer(event) {
-        gSettings.servers = {};
+    function saveOpenHabServerCallback(inEvent) {
+        console.log("Handle new Server from NewServer Page");
+        if (gSettings.servers === undefined) {
+                gSettings.servers = {};
+        }
+        var newSettings = inEvent.detail;       
+        gSettings.servers[newSettings.uuid] = {
+                protocoll: newSettings.protocoll,
+                url: newSettings.url,
+                name: newSettings.name,
+        }
         SetGlobalSettings(inContext);
+        instance.handleGlobalSettings();
+
+    }
+
+    function pressedDeleteServer(event) {
+        var UuidToDelete = getCurrentServer();
+
+        //if (window.gSettings.servers.includes(UuidToDelete)) {
+            if (Object.keys(gSettings.servers).some(key => key === UuidToDelete)) {
+           delete gSettings.servers[UuidToDelete];
+        }
+        //gSettings.servers = {};
+        SetGlobalSettings(inContext);
+        instance.handleGlobalSettings();
     }
 
     this.handleGlobalSettings = function() {
@@ -108,12 +133,17 @@ function MasterPI (inContext, inLanguage) {
         return action;
     }
 
+    function getCurrentServer() {
+        var itemSelect = document.getElementById('server_select');
+        return itemSelect.options[itemSelect.selectedIndex].value;
+    }
+
     this.setSettings = function () {
         var newSettings = {};
 
         var itemSelect = document.getElementById('server_select');
 
-        newSettings.openhab_server = itemSelect.options[itemSelect.selectedIndex].value;
+        newSettings.openhab_server = getCurrentServer();
         newSettings.openhab_item = document.getElementById('openhab_item').value;
        
         newSettings.title_template = document.getElementById("title").value;

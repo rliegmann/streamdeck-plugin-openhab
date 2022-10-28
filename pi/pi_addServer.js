@@ -12,31 +12,39 @@ function isUUID ( uuid ) {
 
 window.onload = function(data) {
     var serverUUID = null;
+    var dataToSend = null;
     console.log(data);
     document.getElementById('button_check').addEventListener('click', check);
+    document.getElementById('button_add').addEventListener('click', add);
+    document.getElementById('button_abord'). addEventListener('click', aboard)
 
     function check() {
         var protocol = document.getElementById('select_protocoll');
         var url = document.getElementById('input_url');
 
-        protocol.disabled = true;
-        url.disabled = true;
+        //protocol.disabled = true;
+        //url.disabled = true;
 
         var queryURL = protocol.value + "://" + url.value + "/rest/uuid";
 
-        fetch(queryURL)
-        .then((response) => response.text())
+        fetch(queryURL).then((response) => {
+        if (response.ok) {
+            return response.text();
+            }
+            throw new Error('Something went wrong');
+        })
         .then(data => {
             console.log(data)
             console.log("Is UUID: " + isUUID(data));
             if (isUUID(data)) {
                 serverUUID = data;
                 checkOK();
+                //checkOK();
             }
             
         })
         .catch((error) => {
-            checkFail();
+            checkFail(error.message);
             protocol.disabled = false;
             url.disabled = false;
         });
@@ -46,6 +54,7 @@ window.onload = function(data) {
 
     function checkOK() {
         var span = document.getElementById('span_checkOK');
+        span.style.color = "#90FF33"; //GREEN
         span.innerHTML = "OK";
 
         var button = document.getElementById('button_add');
@@ -54,7 +63,18 @@ window.onload = function(data) {
         var name = document.getElementById('input_name').value;
         var prot = document.getElementById('select_protocoll').value;
         var url = document.getElementById('input_url').value;
-        
+
+        dataToSend = {
+            detail: {
+                name: name,
+                uuid: serverUUID,
+                protocoll: prot,
+                url: url
+            }
+        };    
+
+       // add(dataToSend)
+        /*
         window.opener.postMessage(
             {
                 name: name,
@@ -62,14 +82,27 @@ window.onload = function(data) {
                 protocoll: prot,
                 url: url
             });
-        window.close();
+        */
+        //window.close();
     }
 
-    function checkFail() {
+    function checkFail(error) {
         var span = document.getElementById('span_checkOK');
-        span.innerHTML = "FAIL";
+        //span.css("color", "red");
+        span.style.color = "#ff0000"; //RED
+        span.innerHTML = "FAIL: " + error;
 
         var button = document.getElementById('button_add');
         button.disabled = true;
+    }
+
+    function add() {
+        var event = new CustomEvent("saveOpenHabServer", dataToSend);
+        window.opener.document.dispatchEvent(event);
+        window.open('','_self').close();
+    }
+
+    function aboard() {
+        window.open('','_self').close();
     }
 }

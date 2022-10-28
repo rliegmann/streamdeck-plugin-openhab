@@ -58,7 +58,7 @@ function ActionLable (inContext, inAction, inSettings, coordinates, openhabConne
     }
 
     const handleOnItemStateChanged = (data) => {
-        console.log('Was fired: ', data); 
+        console.log('Was fired: ', inContext,":   ", data); 
         
         data = instance.ProcessTitleTemplate(data.value);
                 

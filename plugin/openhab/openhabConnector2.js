@@ -16,9 +16,11 @@ class OpenHabServer {
     }
 
     RegisterItemToSubscribe(item) {
+        /*
         if (this.itemsToListen.includes(item)) {
             return;
         }
+        */
 
         this.itemsToListen.push(item);
 
@@ -56,6 +58,10 @@ class OpenHabServer {
         
 
         this.openHabEventSource = new EventSource(queryURL, { ithCredentials: false });
+        this.openHabEventSource.addEventListener('error', function(e) {
+            console.log("ERROR:  " + e);
+        }, true);         
+
         this.openHabEventSource.addEventListener('message', function(e, uuid) {
             //console.log(e.data);
             self.emit('ItemStatusChanged', new OpenHabItemChangedEvent(self.uuid, e.data));
@@ -197,19 +203,14 @@ class OpenHabConnector2 {
 
         var self = this;
 
-        var server = new OpenHabServer(uuid, proticol, url, name);
-        server.on('ItemStatusChanged', function (data)  {
-
-            console.log("NEW ITEM CHANGED FROM: " + data.uuid);        
-            self.emit(data.uuid + "_ItemChanged", data.payload);
-
-        }, false);
+        var server = new OpenHabServer(uuid, proticol, url, name);        
         this._serverList[uuid] = server;
     }
 
     DeregisterServer(removeUUID) {
        if ( (removeUUID in this._serverList) ) {
-           this._serverList[removeUUID].removeListener(this._handleMessagesFromOpenHabserver);
+           
+           this._serverList[removeUUID].removeListener("ItemStatusChanged");
             delete this._serverList[removeUUID];
        }
     }
@@ -226,17 +227,17 @@ class OpenHabConnector2 {
 
     RemoveItemListener (uuid, item) {
         this._serverList[uuid].DeregisterItemToSubscribe(item);
-    }
-
-    _handleMessagesFromOpenHabserver(event) {
-        
-    }
+    }    
 
     CheckServerIsRegestrated (uuid) {
         if (uuid in this._serverList) {
             return true;
         }
         return false;        
+    }
+
+    GetServerWithUUID(uuid) {
+        return this._serverList[uuid];
     }
     
 
@@ -305,46 +306,3 @@ class OpenHabConnector2 {
     }
 
 };
-
-
-//var client = new OpenHabConnector2();
-//client.RegisterServer("http://openhab:8080");
-
-/*
-var payload = {};
-payload.data = [];
-
-client.GetAvailableItems(ITEM_TYPE.SWITCH)
-        .then((data) => {
-            data.forEach(function(entry) {
-                payload["data"].push( {name: entry["name"] } );
-            })
-            console.log(payload);
-        })
-        .catch((error) => {
-            payload["data"].push( {error: error.message } );
-			payload.failed = true;console.log(payload);
-        }); 
-*/
-
-/*
-(async () => {
-    const data = await client.GetCurrentStatus("SchlafzimmerLight_SchlafzimmerLampe");
-    console.log(data);
-
-    client.SendCommandToItem("SchlafzimmerLight_SchlafzimmerLampe", "ON");
-
-    client.RegisterItemToSubscribe("HMSchreibtischHMPB2WM552OEQ0902101_1_PressShort");
-    client.RegisterItemToSubscribe("HMSchreibtischHMPB2WM552OEQ0902101_2_PressShort");
-
-
-    //client.DeregisterItemToSubscribe("HMSchreibtischHMPB2WM552OEQ0902101_1_PressShort");
-
-   client.on('ItemStatusChanged', function(data)  {
-    console.log(data);
-   });
-
-})();
-*/
-
-

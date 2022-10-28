@@ -63,6 +63,8 @@ function connectElgatoStreamDeckSocket(inPort, inPluginUUID, inRegisterEvent, in
                 else if (action == 'com.rliegmann.openhab.switch') {
                     actions[context] = new ActionSwitch(context, action, settings, coordinates, openHabConnector);
                 }
+            } else {
+                actions[context].RefreshOpenhabConnection();
             }
         }
         else if (event == 'willDisappear') {
@@ -71,7 +73,7 @@ function connectElgatoStreamDeckSocket(inPort, inPluginUUID, inRegisterEvent, in
 
             // Do close connections to all services for context
             if (context in actions) {
-                actions[context].Stop();
+                actions[context].Pause();
                 delete actions[context];
             }
         }
@@ -87,6 +89,15 @@ function connectElgatoStreamDeckSocket(inPort, inPluginUUID, inRegisterEvent, in
 
             Object.keys(openHabConnector.Servers).forEach(element => {
                 if ( !(element in gSettings.servers) ) {
+                    
+                    Object.entries(actions).forEach(element2 => {
+                        console.log("LOOP Action");
+                        if ( !(element in element2)) {
+                            console.log("JAAAAAAAAAA zum löschen");
+                            
+                            
+                        }
+                    })              
                     openHabConnector.DeregisterServer(element);
                 }
             });
@@ -94,7 +105,7 @@ function connectElgatoStreamDeckSocket(inPort, inPluginUUID, inRegisterEvent, in
             Object.keys(gSettings.servers).forEach(entry => {            
                 console.log(gSettings.servers[entry]);    
                
-               if ( !(entry in openHabConnector.Servers) ) {
+               if ( !(entry in openHabConnector.Servers) ) {                
                    openHabConnector.RegisterServer(entry, gSettings.servers[entry].protocoll, gSettings.servers[entry].url, gSettings.servers[entry].name);
                }
                
