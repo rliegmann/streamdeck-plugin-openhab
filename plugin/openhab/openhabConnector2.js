@@ -58,6 +58,10 @@ class OpenHabServer {
         
 
         this.openHabEventSource = new EventSource(queryURL, { ithCredentials: false });
+        this.openHabEventSource.addEventListener('error', function(e) {
+            console.log("ERROR:  " + e);
+        }, true);         
+
         this.openHabEventSource.addEventListener('message', function(e, uuid) {
             //console.log(e.data);
             self.emit('ItemStatusChanged', new OpenHabItemChangedEvent(self.uuid, e.data));
