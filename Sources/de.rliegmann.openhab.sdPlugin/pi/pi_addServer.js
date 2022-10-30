@@ -18,6 +18,8 @@ window.onload = function(data) {
     document.getElementById('button_add').addEventListener('click', add);
     document.getElementById('button_abord'). addEventListener('click', aboard)
 
+    document.getElementById('select_authMode').addEventListener("change", authModeChange);
+
     function check() {
         var protocol = document.getElementById('select_protocoll');
         var url = document.getElementById('input_url');
@@ -50,7 +52,6 @@ window.onload = function(data) {
         });
 
     }
-
 
     function checkOK() {
         var span = document.getElementById('span_checkOK');
@@ -104,5 +105,36 @@ window.onload = function(data) {
 
     function aboard() {
         window.open('','_self').close();
+    }
+
+    function authModeChange() {
+        var selected_Mode = document.getElementById('select_authMode').value;
+        console.log(selected_Mode);
+
+        var contentTemplate = document.getElementById('authentication_conntent');
+
+        switch (selected_Mode) {
+            case "none":
+                
+                break;
+            case "username":                                    
+                 contentTemplate.innerHTML = '<div class="container">\
+                                                <label for="uname"><b>Username</b></label>\
+                                                <input type="text" placeholder="Enter Username" name="uname" required >\
+                                                <br>\
+                                                <label for="psw"><b>Password </b></label>\
+                                                <input type="password" placeholder="Enter Password" name="psw" required  >\
+                                            </div>';
+                      
+
+                break;
+            case "token":
+                contentTemplate.innerHTML = '<label for="uname"><b>Token</b></label>\
+                                                <input type="text" placeholder="Token" name="tocken" required >';
+                                            
+                break
+            default:
+                break;
+        }
     }
 }

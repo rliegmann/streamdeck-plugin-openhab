@@ -27,10 +27,30 @@
     <input  id="input_url"  style="height: 50px; min-height: 50px; min-width: 250px; font-size: large;  padding: 0.5em;" type="text" placeholder="openhab:8080" value="openhab:8080">
 </div>
 
+<div>
+    <h2 style="text-align: center;">Security</h2>
+
+    <div style="text-align: center; font-size: medium;">
+        <label for="authMode" style="font-size: medium;">Authentication:</label>
+        <select name="authMode" id="select_authMode" style="height: 30px; font-size: medium;">
+            <option value="none">None</option>
+            <option value="username">Username/Password</option>
+            <option value="token">Token</option>
+        </select>
+    </div>
+    <div id="authentication_conntent" style="text-align: center; margin-top: 1em;">
+
+    </div>
+
+</div>
+
+
 <div style="text-align: center; min-height: 50px;">
     <span id="span_checkOK" style="height: 50px; min-height: 50px; min-width: 50px; font-size: large;"></span>
 
 </div>
+
+
 
 
 <div style=" text-align: center; margin-left: auto; margin-top: 1%">
