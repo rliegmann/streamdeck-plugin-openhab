@@ -8,11 +8,18 @@ function isUUID ( uuid ) {
     return true;
 }
 
+const AUTHENTICATION_MODE = { 
+    NONE: 'NONE',
+    USERNAME_PASSWORD: "USERNAME_PASSWORD",
+    TOKEN: 'TOKEN'
+}
+
 
 
 window.onload = function(data) {
     var serverUUID = null;
     var dataToSend = null;
+    var authenticationMode = AUTHENTICATION_MODE.NONE;;
     console.log(data);
     document.getElementById('button_check').addEventListener('click', check);
     document.getElementById('button_add').addEventListener('click', add);
@@ -24,12 +31,39 @@ window.onload = function(data) {
         var protocol = document.getElementById('select_protocoll');
         var url = document.getElementById('input_url');
 
-        //protocol.disabled = true;
-        //url.disabled = true;
-
         var queryURL = protocol.value + "://" + url.value + "/rest/uuid";
+        var options = "";
 
-        fetch(queryURL).then((response) => {
+        switch (authenticationMode) {
+            case AUTHENTICATION_MODE.NONE:
+                options = {
+
+                }
+                break;
+        
+            case AUTHENTICATION_MODE.USERNAME_PASSWORD:
+                var user = document.getElementById('uname').value;
+                var pass = document.getElementById('psw').value;
+                options = {
+                    headers: {
+                        'Authorization': `Basic ${btoa(`${user}:${pass}`)}`,
+                    },                   
+                }
+            break;
+
+            case AUTHENTICATION_MODE.TOKEN:
+                var token = document.getElementById('token').value;
+                options = {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                    },
+                }
+                break;
+            default:
+                break;
+        }        
+
+        fetch(queryURL, options).then((response) => {
         if (response.ok) {
             return response.text();
             }
@@ -64,13 +98,42 @@ window.onload = function(data) {
         var name = document.getElementById('input_name').value;
         var prot = document.getElementById('select_protocoll').value;
         var url = document.getElementById('input_url').value;
+        
+        var authentication = {};
+
+        switch (authenticationMode) {
+            case AUTHENTICATION_MODE.NONE:
+                authentication = {
+                    mode: 'none'
+                }
+                break;
+            case AUTHENTICATION_MODE.USERNAME_PASSWORD:
+                var user = document.getElementById('uname').value;
+                var pass = document.getElementById('psw').value;
+                authentication = {
+                    mode: 'basic',
+                    username: user,
+                    pass: pass
+                }
+                break;
+            case AUTHENTICATION_MODE.TOKEN:
+                var token = document.getElementById('token').value;
+                authentication = {
+                    mode: 'token',
+                    token: token
+                }
+                break;        
+            default:
+                break;
+        }
 
         dataToSend = {
             detail: {
                 name: name,
                 uuid: serverUUID,
                 protocoll: prot,
-                url: url
+                url: url,
+                auth: authentication
             }
         };    
 
@@ -115,22 +178,24 @@ window.onload = function(data) {
 
         switch (selected_Mode) {
             case "none":
-                
+                contentTemplate.innerHTML = "";
+                authenticationMode = AUTHENTICATION_MODE.NONE;
                 break;
             case "username":                                    
                  contentTemplate.innerHTML = '<div class="container">\
                                                 <label for="uname"><b>Username</b></label>\
-                                                <input type="text" placeholder="Enter Username" name="uname" required >\
+                                                <input type="text" placeholder="Enter Username" id="uname" required >\
                                                 <br>\
                                                 <label for="psw"><b>Password </b></label>\
-                                                <input type="password" placeholder="Enter Password" name="psw" required  >\
+                                                <input type="password" placeholder="Enter Password" id="psw" required  >\
                                             </div>';
-                      
+                authenticationMode = AUTHENTICATION_MODE.USERNAME_PASSWORD;
 
                 break;
             case "token":
                 contentTemplate.innerHTML = '<label for="uname"><b>Token</b></label>\
-                                                <input type="text" placeholder="Token" name="tocken" required >';
+                                                <input type="text" placeholder="Token" id="token" required >';
+                authenticationMode = AUTHENTICATION_MODE.TOKEN;
                                             
                 break
             default:

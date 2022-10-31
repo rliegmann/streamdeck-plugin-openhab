@@ -66,6 +66,7 @@ function MasterPI (inContext, inLanguage) {
                 url: newSettings.url,
                 name: newSettings.name,
         }
+        return;
         SetGlobalSettings(inContext);
         instance.handleGlobalSettings();
 
