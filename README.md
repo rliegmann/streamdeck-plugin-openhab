@@ -36,6 +36,13 @@ Light
 
 ---
 
+## Important Hints
+
+Since the onboard EventSource class cannot manage direct credentials, the node module [microsoft/fetch-event-source](https://github.com/Azure/fetch-event-source) is used. This is imported via NPM and then built into a bundle with browserify. 
+The bundle can be built with ``npi run build`` in the plugin/node folder.
+
+---
+
 ## Bekannte Probleme
 
 Das Hintergrund Icon wechselt immer zwischen den zwei defenierten Zuständen, wenn eine taste gedrück wird. Dies kann eventuell über die Key Up Funktion immer mit gewahlt zurück gesetzt werden. (https://www.reddit.com/r/StreamDeckSDK/comments/lvvazi/how_to_disable_the_behavior_that_stream_deck/)
