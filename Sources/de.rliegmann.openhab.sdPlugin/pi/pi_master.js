@@ -67,7 +67,7 @@ function MasterPI (inContext, inLanguage) {
                      name: newSettings.name,
                      auth: newSettings.auth
         }
-        return;
+        
         SetGlobalSettings(inContext);
         instance.handleGlobalSettings();
 

@@ -1,6 +1,8 @@
 class OpenHabServer {
     itemsToListen = [];
     openHabEventSource = null;
+    ctrl = new AbortController();
+    
 
     constructor(uuid, protocol, url, name, auth) {
         this.uuid = uuid;
@@ -10,19 +12,14 @@ class OpenHabServer {
         this.auth = auth;
 
         this._events = {};
+        this.ctrl = new AbortController();
     }
 
     _baseURL() {
         return this.protocol + "://" + this.url + "/rest/";
     }
 
-    RegisterItemToSubscribe(item) {
-        /*
-        if (this.itemsToListen.includes(item)) {
-            return;
-        }
-        */
-
+    RegisterItemToSubscribe(item) {  
         this.itemsToListen.push(item);
 
         this._refreshEventSubscriber();
@@ -34,14 +31,19 @@ class OpenHabServer {
             if (index > -1) {
                 this.itemsToListen.splice(index, 1);
             }
+            this._refreshEventSubscriber();
         }
 
-        this._refreshEventSubscriber();
+       
     }
 
     _refreshEventSubscriber() {
+
+        
         if (this.openHabEventSource != null) {
-            this.openHabEventSource.close();
+           this.ctrl.abort("STOP");
+           //this.openHabEventSource = null;
+           this.ctrl = new AbortController();
         }
 
         if ( this.itemsToListen.length == 0) {
@@ -55,56 +57,55 @@ class OpenHabServer {
             queryURL = queryURL + 'openhab/items/' + element + '/statechanged,';
         });
 
-        console.log(queryURL);
+        console.log("New Query: " + queryURL);
         var options = this._buildConnectionOptions();
-             
-        /*
-        this.openHabEventSource = new EventSource(queryURL);
-        this.openHabEventSource.addEventListener('error', function(e) {
-            console.log("ERROR:  " + e);
-        }, true);  
-        */  
-        
-        this.openHabEventSource = window.mEventSource.fetchEventSource(queryURL, {        
+              
+        /* Azure EventSource */
+
+        this.openHabEventSource = new window.mEventSource.fetchEventSource(queryURL, {        
             method: 'GET',
-            headers: {
-                'Content-Type': 'text/event-stream',
-                'Authorization': `Bearer ${this.auth.token}`,
-                },            
-        
+            headers: options.headers,  
+            signal: this.ctrl.signal,
             onmessage(e) {
                 console.log(e.data);
-                self.emit('ItemStatusChanged', new OpenHabItemChangedEvent(self.uuid, e.data));
+                if (e.data == `{"type":"ALIVE"}`) {
+                    // Do anything with the Alive Message
+                    console.log("ALIVE from OpenHAB Server :-)");
+                } else {
+                    self.emit('ItemStatusChanged', new OpenHabItemChangedEvent(self.uuid, e.data));
+                }
             },
             onerror(err) {
                 console.log(err);
             }
         
-            /*
-            this.openHabEventSource.addEventListener('message', function(e, uuid) {
-                //console.log(e.data);
-                self.emit('ItemStatusChanged', new OpenHabItemChangedEvent(self.uuid, e.data));
-            }, false);
-        */    
-         });
+            
+        });
+        
     } 
 
     _buildConnectionOptions () {
         var options = "";
         switch (this.auth.mode) {
             case 'none':   
-            options = {};             
+            options = {
+                headers: {
+                    'Content-Type': 'text/event-stream',
+                }
+            };             
                 break;
             case 'basic':
                 options = {
                     headers: {
-                        'Authorization': `Basic ${btoa(`${this.auth.user}:${this.auth.pass}`)}`,
+                        'Content-Type': 'text/event-stream',
+                        'Authorization': `Basic ${btoa(`${this.auth.username}:${this.auth.pass}`)}`,
                     },                   
                 }
                 break;
             case 'token':
                 options = {
                     headers: {
+                        'Content-Type': 'text/event-stream',
                         'Authorization': `Bearer ${this.auth.token}`,
                     },
                 }

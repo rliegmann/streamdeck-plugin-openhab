@@ -129,7 +129,9 @@ function Action(inAction, inContext, settings, coordinates, openhabConnector) {
             emit("onItemStateChanged", new ActionItemChangedEcentPayload("-", item.value, "-", "-"));
 
             if ( previousSettingsCache.openhab_item != settingsCache.openhab_item ) {
-                openhabServer.DeregisterItemToSubscribe( previousSettingsCache.openhab_item );
+                if (previousSettingsCache.openhab_item != "---") {
+                    openhabServer.DeregisterItemToSubscribe( previousSettingsCache.openhab_item );
+                }
                 openhabServer.RegisterItemToSubscribe( settingsCache.openhab_item );  
 
                this.isInitialized = true;
