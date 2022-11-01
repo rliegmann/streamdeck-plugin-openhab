@@ -102,14 +102,9 @@ function connectElgatoStreamDeckSocket(inPort, inPluginUUID, inRegisterEvent, in
                 }
             });
 
-            Object.keys(gSettings.servers).forEach(entry => {            
-                console.log(gSettings.servers[entry]);    
-               /*
-               if ( !(entry in openHabConnector.Servers) ) {                
-                   openHabConnector.RegisterServer(entry, gSettings.servers[entry].protocoll, gSettings.servers[entry].url, gSettings.servers[entry].name, gSettings.servers[entry].auth);
-               }
-               */
-               openHabConnector.RegisterServer(entry, gSettings.servers[entry].protocoll, gSettings.servers[entry].url, gSettings.servers[entry].name, gSettings.servers[entry].auth);
+            Object.keys(gSettings.servers).forEach(entry => {         
+                console.log(gSettings.servers[entry]);                 
+                openHabConnector.RegisterServer(entry, gSettings.servers[entry].protocoll, gSettings.servers[entry].url, gSettings.servers[entry].name, gSettings.servers[entry].auth);
             })
 
             

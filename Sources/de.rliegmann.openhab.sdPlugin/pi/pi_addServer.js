@@ -14,8 +14,6 @@ const AUTHENTICATION_MODE = {
     TOKEN: 'TOKEN'
 }
 
-
-
 window.onload = function(data) {
     var serverUUID = null;
     var dataToSend = null;
