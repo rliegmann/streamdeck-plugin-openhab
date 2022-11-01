@@ -106,7 +106,7 @@ function connectElgatoStreamDeckSocket(inPort, inPluginUUID, inRegisterEvent, in
                 console.log(gSettings.servers[entry]);    
                
                if ( !(entry in openHabConnector.Servers) ) {                
-                   openHabConnector.RegisterServer(entry, gSettings.servers[entry].protocoll, gSettings.servers[entry].url, gSettings.servers[entry].name);
+                   openHabConnector.RegisterServer(entry, gSettings.servers[entry].protocoll, gSettings.servers[entry].url, gSettings.servers[entry].name, gSettings.servers[entry].auth);
                }
                
             })

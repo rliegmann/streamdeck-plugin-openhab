@@ -63,10 +63,10 @@ function MasterPI (inContext, inLanguage) {
         var newSettings = inEvent.detail;       
         gSettings.servers[newSettings.uuid] = {
                 protocoll: newSettings.protocoll,
-                url: newSettings.url,
-                name: newSettings.name,
+                      url: newSettings.url,
+                     name: newSettings.name,
+                     auth: newSettings.auth
         }
-        return;
         SetGlobalSettings(inContext);
         instance.handleGlobalSettings();
 
