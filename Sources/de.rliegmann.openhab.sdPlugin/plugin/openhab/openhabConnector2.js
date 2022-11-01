@@ -37,6 +37,11 @@ class OpenHabServer {
        
     }
 
+    DeregisterAllItemsToSubscribe() {
+        this.itemsToListen = [];
+        this._refreshEventSubscriber();
+    }
+
     _refreshEventSubscriber() {
 
         
@@ -219,6 +224,10 @@ class OpenHabServer {
     
         this._events[name].forEach(fireCallbacks);
     }
+
+    UpdateServerSettings() {
+
+    }
 }
 
 
@@ -243,11 +252,12 @@ class OpenHabConnector2 {
     }
 
     RegisterServer(uuid, proticol, url, name, auth) {
-
+        
         if ((uuid in this._serverList)) {
-            console.log("Server allready registred");
-            return;
+            console.log("Server allready registred. Update Settings");
+            this._serverList[uuid].DeregisterAllItemsToSubscribe();
         }
+                
 
         var self = this;
 
