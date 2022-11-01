@@ -8,26 +8,85 @@ function isUUID ( uuid ) {
     return true;
 }
 
-
+const AUTHENTICATION_MODE = { 
+    NONE: 'NONE',
+    USERNAME_PASSWORD: "USERNAME_PASSWORD",
+    TOKEN: 'TOKEN'
+}
 
 window.onload = function(data) {
     var serverUUID = null;
     var dataToSend = null;
-    console.log(data);
+    var authenticationMode = AUTHENTICATION_MODE.NONE;;
+   
     document.getElementById('button_check').addEventListener('click', check);
     document.getElementById('button_add').addEventListener('click', add);
     document.getElementById('button_abord'). addEventListener('click', aboard)
 
+    document.getElementById('select_authMode').addEventListener("change", authModeChange);
+
+   
+    console.log(window.editData);
+
+    if (window.editData != null) {
+        document.getElementById('input_name').value = window.editData.name;
+        document.getElementById('select_protocoll').value = window.editData.protocoll;
+        document.getElementById('input_url').value = window.editData.url;
+        
+        switch (window.editData.auth.mode) {
+            case 'none':                
+                break;
+            case 'basic':
+                document.getElementById('select_authMode').value = "username";
+                authModeChange();
+                document.getElementById('uname').value = window.editData.auth.username;
+                document.getElementById('psw').value = window.editData.auth.pass;
+                break;
+            case 'token':
+                document.getElementById('select_authMode').value = "token";
+                authModeChange();
+                document.getElementById('token').value = window.editData.auth.token;
+                break;
+        }
+    }
+    
     function check() {
         var protocol = document.getElementById('select_protocoll');
         var url = document.getElementById('input_url');
 
-        //protocol.disabled = true;
-        //url.disabled = true;
-
         var queryURL = protocol.value + "://" + url.value + "/rest/uuid";
+        var options = "";
 
-        fetch(queryURL).then((response) => {
+        switch (authenticationMode) {
+            case AUTHENTICATION_MODE.NONE:
+                options = {
+
+                }
+                break;
+        
+            case AUTHENTICATION_MODE.USERNAME_PASSWORD:
+                var user = document.getElementById('uname').value;
+                var pass = document.getElementById('psw').value;
+                options = {
+                    headers: {
+                        'Authorization': `Basic ${btoa(`${user}:${pass}`)}`,
+                    },                   
+                }
+            break;
+
+            case AUTHENTICATION_MODE.TOKEN:
+                var token = document.getElementById('token').value;
+                options = {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                    },
+                }
+                break;
+            default:
+                break;
+        }        
+
+        fetch(queryURL, options).then((response) => {
         if (response.ok) {
             return response.text();
             }
@@ -51,7 +110,6 @@ window.onload = function(data) {
 
     }
 
-
     function checkOK() {
         var span = document.getElementById('span_checkOK');
         span.style.color = "#90FF33"; //GREEN
@@ -63,13 +121,42 @@ window.onload = function(data) {
         var name = document.getElementById('input_name').value;
         var prot = document.getElementById('select_protocoll').value;
         var url = document.getElementById('input_url').value;
+        
+        var authentication = {};
+
+        switch (authenticationMode) {
+            case AUTHENTICATION_MODE.NONE:
+                authentication = {
+                    mode: 'none'
+                }
+                break;
+            case AUTHENTICATION_MODE.USERNAME_PASSWORD:
+                var user = document.getElementById('uname').value;
+                var pass = document.getElementById('psw').value;
+                authentication = {
+                    mode: 'basic',
+                    username: user,
+                    pass: pass
+                }
+                break;
+            case AUTHENTICATION_MODE.TOKEN:
+                var token = document.getElementById('token').value;
+                authentication = {
+                    mode: 'token',
+                    token: token
+                }
+                break;        
+            default:
+                break;
+        }
 
         dataToSend = {
             detail: {
                 name: name,
                 uuid: serverUUID,
                 protocoll: prot,
-                url: url
+                url: url,
+                auth: authentication
             }
         };    
 
@@ -105,4 +192,42 @@ window.onload = function(data) {
     function aboard() {
         window.open('','_self').close();
     }
+
+    function authModeChange() {
+        var selected_Mode = document.getElementById('select_authMode').value;
+        console.log(selected_Mode);
+
+        var contentTemplate = document.getElementById('authentication_conntent');
+
+        switch (selected_Mode) {
+            case "none":
+                contentTemplate.innerHTML = "";
+                authenticationMode = AUTHENTICATION_MODE.NONE;
+                break;
+            case "username":                                    
+                 contentTemplate.innerHTML = '<div class="container">\
+                                                <label for="uname"><b>Username</b></label>\
+                                                <input type="text" placeholder="Enter Username" id="uname" required >\
+                                                <br>\
+                                                <label for="psw"><b>Password </b></label>\
+                                                <input type="password" placeholder="Enter Password" id="psw" required  >\
+                                            </div>';
+                authenticationMode = AUTHENTICATION_MODE.USERNAME_PASSWORD;
+
+                break;
+            case "token":
+                contentTemplate.innerHTML = '<label for="uname"><b>Token</b></label>\
+                                                <input type="text" placeholder="Token" id="token" required >';
+                authenticationMode = AUTHENTICATION_MODE.TOKEN;
+                                            
+                break
+            default:
+                break;
+        }
+    }
 }
+
+window.addEventListener("message", (event) => {
+       alert(event.data); 
+    console.log("Revice: ---->" + event.data).pName;
+});

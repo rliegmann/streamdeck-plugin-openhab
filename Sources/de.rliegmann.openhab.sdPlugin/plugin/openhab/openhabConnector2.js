@@ -1,27 +1,25 @@
 class OpenHabServer {
     itemsToListen = [];
     openHabEventSource = null;
+    ctrl = new AbortController();
+    
 
-    constructor(uuid, protocol, url, name) {
+    constructor(uuid, protocol, url, name, auth) {
         this.uuid = uuid;
         this.protocol = protocol;
         this.url = url;
         this.name = name;
+        this.auth = auth;
 
         this._events = {};
+        this.ctrl = new AbortController();
     }
 
     _baseURL() {
         return this.protocol + "://" + this.url + "/rest/";
     }
 
-    RegisterItemToSubscribe(item) {
-        /*
-        if (this.itemsToListen.includes(item)) {
-            return;
-        }
-        */
-
+    RegisterItemToSubscribe(item) {  
         this.itemsToListen.push(item);
 
         this._refreshEventSubscriber();
@@ -33,14 +31,24 @@ class OpenHabServer {
             if (index > -1) {
                 this.itemsToListen.splice(index, 1);
             }
+            this._refreshEventSubscriber();
         }
 
+       
+    }
+
+    DeregisterAllItemsToSubscribe() {
+        this.itemsToListen = [];
         this._refreshEventSubscriber();
     }
 
     _refreshEventSubscriber() {
+
+        
         if (this.openHabEventSource != null) {
-            this.openHabEventSource.close();
+           this.ctrl.abort("STOP");
+           //this.openHabEventSource = null;
+           this.ctrl = new AbortController();
         }
 
         if ( this.itemsToListen.length == 0) {
@@ -54,18 +62,61 @@ class OpenHabServer {
             queryURL = queryURL + 'openhab/items/' + element + '/statechanged,';
         });
 
-        console.log(queryURL);
+        console.log("New Query: " + queryURL);
+        var options = this._buildConnectionOptions();
+              
+        /* Azure EventSource */
+
+        this.openHabEventSource = new window.mEventSource.fetchEventSource(queryURL, {        
+            method: 'GET',
+            headers: options.headers,  
+            signal: this.ctrl.signal,
+            onmessage(e) {
+                console.log(e.data);
+                if (e.data == `{"type":"ALIVE"}`) {
+                    // Do anything with the Alive Message
+                    console.log("ALIVE from OpenHAB Server :-)");
+                } else {
+                    self.emit('ItemStatusChanged', new OpenHabItemChangedEvent(self.uuid, e.data));
+                }
+            },
+            onerror(err) {
+                console.log(err);
+            }
         
+            
+        });
+        
+    } 
 
-        this.openHabEventSource = new EventSource(queryURL, { ithCredentials: false });
-        this.openHabEventSource.addEventListener('error', function(e) {
-            console.log("ERROR:  " + e);
-        }, true);         
-
-        this.openHabEventSource.addEventListener('message', function(e, uuid) {
-            //console.log(e.data);
-            self.emit('ItemStatusChanged', new OpenHabItemChangedEvent(self.uuid, e.data));
-        }, false);
+    _buildConnectionOptions () {
+        var options = "";
+        switch (this.auth.mode) {
+            case 'none':   
+            options = {
+                headers: {
+                    'Content-Type': 'text/event-stream',
+                }
+            };             
+                break;
+            case 'basic':
+                options = {
+                    headers: {
+                        'Content-Type': 'text/event-stream',
+                        'Authorization': `Basic ${btoa(`${this.auth.username}:${this.auth.pass}`)}`,
+                    },                   
+                }
+                break;
+            case 'token':
+                options = {
+                    headers: {
+                        'Content-Type': 'text/event-stream',
+                        'Authorization': `Bearer ${this.auth.token}`,
+                    },
+                }
+                break;            
+        }
+        return options;
     }
 
     GetAvailableItems(uuid, itemType = ITEM_TYPE) {
@@ -84,8 +135,10 @@ class OpenHabServer {
 
         queryURL = queryURL + "&recursive=false";
 
+        var options = this._buildConnectionOptions();
+
         return new Promise((resolove, reject) => {
-            fetch(queryURL)
+            fetch(queryURL, options)
             .then(function(response) {
                 if (response.status !== 200) {
                     console.log('Looks like there was a problem. Status Code: ' +
@@ -171,8 +224,11 @@ class OpenHabServer {
     
         this._events[name].forEach(fireCallbacks);
     }
-}
 
+    UpdateServerSettings() {
+
+    }
+}
 
 class OpenHabItemChangedEvent {
     constructor(uuid, payload) {
@@ -181,12 +237,6 @@ class OpenHabItemChangedEvent {
     }
 }
 
-
-
-
-
-
-
 class OpenHabConnector2 {
     _serverList = [];
     
@@ -194,16 +244,14 @@ class OpenHabConnector2 {
         this._events = {};
     }
 
-    RegisterServer(uuid, proticol, url, name) {
+    RegisterServer(uuid, proticol, url, name, auth) {
+        
+        if ((uuid in this._serverList)) { //If the server already exists but is to be registered again, the settings have changed.
+            console.log("Server allready registred. Update Settings");
+            this._serverList[uuid].DeregisterAllItemsToSubscribe();     // Remove all items for listening and reset with the new settings.
+        }     
 
-        if ((uuid in this._serverList)) {
-            console.log("Server allready registred");
-            return;
-        }
-
-        var self = this;
-
-        var server = new OpenHabServer(uuid, proticol, url, name);        
+        var server = new OpenHabServer(uuid, proticol, url, name, auth);        
         this._serverList[uuid] = server;
     }
 
@@ -238,8 +286,7 @@ class OpenHabConnector2 {
 
     GetServerWithUUID(uuid) {
         return this._serverList[uuid];
-    }
-    
+    }    
 
     // EVENTS
     on(name, listener) {

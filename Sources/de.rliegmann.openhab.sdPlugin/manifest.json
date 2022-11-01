@@ -57,7 +57,7 @@
   "Name": "openHAB", 
   "Icon": "pluginIcon", 
   "URL": "https://github.com/rliegmann/streamdeck-plugin-openhab", 
-  "Version": "1.0",
+  "Version": "1.1",
   "Category": "OpenHAB",
   "CategoryIcon": "pluginIcon",
   "OS": [
