@@ -37,6 +37,11 @@ class OpenHabServer {
        
     }
 
+    DeregisterAllItemsToSubscribe() {
+        this.itemsToListen = [];
+        this._refreshEventSubscriber();
+    }
+
     _refreshEventSubscriber() {
 
         
@@ -219,8 +224,11 @@ class OpenHabServer {
     
         this._events[name].forEach(fireCallbacks);
     }
-}
 
+    UpdateServerSettings() {
+
+    }
+}
 
 class OpenHabItemChangedEvent {
     constructor(uuid, payload) {
@@ -228,12 +236,6 @@ class OpenHabItemChangedEvent {
         this.payload = payload;
     }
 }
-
-
-
-
-
-
 
 class OpenHabConnector2 {
     _serverList = [];
@@ -243,13 +245,11 @@ class OpenHabConnector2 {
     }
 
     RegisterServer(uuid, proticol, url, name, auth) {
-
-        if ((uuid in this._serverList)) {
-            console.log("Server allready registred");
-            return;
-        }
-
-        var self = this;
+        
+        if ((uuid in this._serverList)) { //If the server already exists but is to be registered again, the settings have changed.
+            console.log("Server allready registred. Update Settings");
+            this._serverList[uuid].DeregisterAllItemsToSubscribe();     // Remove all items for listening and reset with the new settings.
+        }     
 
         var server = new OpenHabServer(uuid, proticol, url, name, auth);        
         this._serverList[uuid] = server;
@@ -286,8 +286,7 @@ class OpenHabConnector2 {
 
     GetServerWithUUID(uuid) {
         return this._serverList[uuid];
-    }
-    
+    }    
 
     // EVENTS
     on(name, listener) {

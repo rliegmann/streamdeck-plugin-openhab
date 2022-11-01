@@ -4,11 +4,14 @@ function MasterPI (inContext, inLanguage) {
     // Init PI
     var instance = this;
 
+    var test;
+
     // Add event listener   
     document.getElementById('openhab_item').addEventListener('change', itemChanged);
     document.getElementById('openhab_item_refresh').addEventListener('click', refresh);
 
     document.getElementById('button_new').addEventListener('click', pressedAddServer);
+    document.getElementById('button_edit').addEventListener('click', pressedEdit);
     document.getElementById('button_delete').addEventListener('click', pressedDeleteServer);
     document.getElementById('server_select').addEventListener('change', serverChanged2);
 
@@ -53,7 +56,7 @@ function MasterPI (inContext, inLanguage) {
 
             this.window.removeEventListener('message', this, true);
         }, false);
-    }
+    }   
 
     function saveOpenHabServerCallback(inEvent) {
         console.log("Handle new Server from NewServer Page");
@@ -73,7 +76,16 @@ function MasterPI (inContext, inLanguage) {
 
     }
 
-    function pressedDeleteServer(event) {
+    function pressedEdit(event) {
+        var server = getCurrentServer();
+
+         test = window.open('pi_addServer.html', "Edit Server", "ABCD");   
+         test.editData = gSettings.servers[server];  
+        
+        
+    }
+
+    function pressedDeleteServer(event) {       
         var UuidToDelete = getCurrentServer();
 
         //if (window.gSettings.servers.includes(UuidToDelete)) {

@@ -14,19 +14,42 @@ const AUTHENTICATION_MODE = {
     TOKEN: 'TOKEN'
 }
 
-
-
 window.onload = function(data) {
     var serverUUID = null;
     var dataToSend = null;
     var authenticationMode = AUTHENTICATION_MODE.NONE;;
-    console.log(data);
+   
     document.getElementById('button_check').addEventListener('click', check);
     document.getElementById('button_add').addEventListener('click', add);
     document.getElementById('button_abord'). addEventListener('click', aboard)
 
     document.getElementById('select_authMode').addEventListener("change", authModeChange);
 
+   
+    console.log(window.editData);
+
+    if (window.editData != null) {
+        document.getElementById('input_name').value = window.editData.name;
+        document.getElementById('select_protocoll').value = window.editData.protocoll;
+        document.getElementById('input_url').value = window.editData.url;
+        
+        switch (window.editData.auth.mode) {
+            case 'none':                
+                break;
+            case 'basic':
+                document.getElementById('select_authMode').value = "username";
+                authModeChange();
+                document.getElementById('uname').value = window.editData.auth.username;
+                document.getElementById('psw').value = window.editData.auth.pass;
+                break;
+            case 'token':
+                document.getElementById('select_authMode').value = "token";
+                authModeChange();
+                document.getElementById('token').value = window.editData.auth.token;
+                break;
+        }
+    }
+    
     function check() {
         var protocol = document.getElementById('select_protocoll');
         var url = document.getElementById('input_url');
@@ -203,3 +226,8 @@ window.onload = function(data) {
         }
     }
 }
+
+window.addEventListener("message", (event) => {
+       alert(event.data); 
+    console.log("Revice: ---->" + event.data).pName;
+});
