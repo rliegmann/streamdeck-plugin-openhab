@@ -59,15 +59,28 @@ function ActionContact (inContext, inAction, inSettings, coordinates, openhabCon
 
     const handleOnItemStateChanged = (data) => {
         console.log('Was fired: ', inContext,":   ", data); 
+
+        var state = null;
+        switch (data.value) {
+            case "CLOSED":
+                state = 0;
+                break;
+            case "OPEN":
+                state = 1;  
+                break;      
+            default:
+                state = 0;
+                break;
+        }
         
-        data = instance.ProcessTitleTemplate(data.value);
+        data = instance.ProcessTitleTemplate(data.value);       
                 
         var payload = {            
                 title: data,
-                target: STREAM_DECK_TARGET_TYPE.BOTH,
-                state: 0
+                target: STREAM_DECK_TARGET_TYPE.BOTH                
             };
             instance.SetTitle(payload);
+            instance.SetState(state);
     
     };
 
