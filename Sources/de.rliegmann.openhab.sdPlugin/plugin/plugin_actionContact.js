@@ -12,18 +12,7 @@ function ActionContact (inContext, inAction, inSettings, coordinates, openhabCon
     this.SetNewSettings = async function(newSettings) {
         console.log("Setze neue Settings in ActionContact");
 
-        if (newSettings.specificSettings != undefined) {
-            if (newSettings.specificSettings.closeValue != undefined) {
-                closedAlias = newSettings.specificSettings.closeValue;
-            } else {
-                closedAlias = undefined;
-            }
-            if (newSettings.specificSettings.openValue != undefined) {
-                openAlias = newSettings.specificSettings.openValue;
-            } else {
-                openAlias = undefined;
-            }
-        }
+        processAliasValues(newSettings);
 
       /*
         if (newSettings.openhab_server != instance.Settings.openhab_server ||
@@ -45,6 +34,21 @@ function ActionContact (inContext, inAction, inSettings, coordinates, openhabCon
         instance.Settings = newSettings;
          
          console.log(instance.Settings); 
+    }
+
+    function processAliasValues(newSettings) {
+        if (newSettings.specificSettings != undefined) {
+            if (newSettings.specificSettings.closeValue != undefined) {
+                closedAlias = newSettings.specificSettings.closeValue;
+            } else {
+                closedAlias = undefined;
+            }
+            if (newSettings.specificSettings.openValue != undefined) {
+                openAlias = newSettings.specificSettings.openValue;
+            } else {
+                openAlias = undefined;
+            }
+        }
     }
 
     this.SendSettings = function () {       
@@ -71,6 +75,8 @@ function ActionContact (inContext, inAction, inSettings, coordinates, openhabCon
         console.log("BIS Hier habe ich es geschafft");      
                
     }
+
+    processAliasValues(inSettings);
 
     const handleOnItemStateChanged = (data) => {
         console.log('Was fired: ', inContext,":   ", data); 
