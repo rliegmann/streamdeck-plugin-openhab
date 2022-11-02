@@ -53,6 +53,9 @@ function Action(inAction, inContext, settings, coordinates, openhabConnector) {
     if (settings.hasOwnProperty('title_template')) {
         settingsCache.title_template = settings["title_template"];
     }
+    if (settings.hasOwnProperty('specificSettings')) {
+        settingsCache.specificSettings = settings["specificSettings"];
+    }
 
     
   
