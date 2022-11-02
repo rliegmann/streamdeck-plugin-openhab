@@ -2,6 +2,9 @@ function ActionContact (inContext, inAction, inSettings, coordinates, openhabCon
     var instance = this;
     var action = inAction;
 
+    var closedAlias = undefined;
+    var openAlias = undefined;
+
     this.GetAvailableItems = function() {
         instance.GetAvailableItems("none");
     }
@@ -9,6 +12,18 @@ function ActionContact (inContext, inAction, inSettings, coordinates, openhabCon
     this.SetNewSettings = async function(newSettings) {
         console.log("Setze neue Settings in ActionContact");
 
+        if (newSettings.specificSettings != undefined) {
+            if (newSettings.specificSettings.closeValue != undefined) {
+                closedAlias = newSettings.specificSettings.closeValue;
+            } else {
+                closedAlias = undefined;
+            }
+            if (newSettings.specificSettings.openValue != undefined) {
+                openAlias = newSettings.specificSettings.openValue;
+            } else {
+                openAlias = undefined;
+            }
+        }
 
       /*
         if (newSettings.openhab_server != instance.Settings.openhab_server ||
@@ -64,14 +79,22 @@ function ActionContact (inContext, inAction, inSettings, coordinates, openhabCon
         switch (data.value) {
             case "CLOSED":
                 state = 0;
+                if (closedAlias != undefined) {
+                    data.value = closedAlias;
+                }
                 break;
             case "OPEN":
                 state = 1;  
+                if (openAlias != undefined) {
+                    data.value = openAlias;
+                }
                 break;      
             default:
                 state = 0;
                 break;
         }
+
+
         
         data = instance.ProcessTitleTemplate(data.value);       
                 

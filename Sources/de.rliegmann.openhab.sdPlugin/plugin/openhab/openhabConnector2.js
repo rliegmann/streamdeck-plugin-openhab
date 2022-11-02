@@ -126,9 +126,10 @@ class OpenHabServer {
             case ITEM_TYPE.NONE:
                 break;
             case ITEM_TYPE.SWITCH:
-                queryURL = queryURL + "type=" + itemType
+                queryURL = queryURL + "type=" + itemType;
                 break;
-        
+            case ITEM_TYPE.CONTACT:
+                queryURL = queryURL + "type=" + itemType;
             default:
                 break;
         }

@@ -1,4 +1,5 @@
 const ITEM_TYPE = { 
     NONE: "",
-    SWITCH: "Switch"
+    SWITCH: "Switch",
+    CONTACT: "Contact"
 };
