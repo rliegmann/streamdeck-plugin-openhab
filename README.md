@@ -31,7 +31,8 @@ Light
 
 
 ### Next development:
-- Button
+- Button (Send custom Data (String, etc.) to a Item
+- Windows Status (Show current Contact State)
 - Blinds
 
 ---
