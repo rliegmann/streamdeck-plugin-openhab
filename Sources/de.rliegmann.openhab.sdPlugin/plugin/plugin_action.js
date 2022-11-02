@@ -155,7 +155,10 @@ function Action(inAction, inContext, settings, coordinates, openhabConnector) {
                 break;
             case "com.temp.openhab.switch":
                 type = ITEM_TYPE.SWITCH;
-                break;        
+                break;   
+            case 'com.rliegmann.openhab.contact':
+                type = ITEM_TYPE.CONTACT;
+                break;
             default:
                 type = ITEM_TYPE.NONE;
                 break;

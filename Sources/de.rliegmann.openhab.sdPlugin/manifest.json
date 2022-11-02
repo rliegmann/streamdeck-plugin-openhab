@@ -21,6 +21,26 @@
       "UUID": "com.rliegmann.openhab.switch"
     },
     {
+      "Icon": "pluginIcon",
+      "Name": "Contact (OPEN/CLOSE)",
+      "States":[
+        {
+          "Image": "icons/window_closed",
+          "TitleAlignment": "middle",
+          "FontSize": "16"
+        },
+        {
+          "Image": "icons/window_open",
+          "TitleAlignment": "middle",
+          "FontSize": "16"
+        }
+      ],
+      "PropertyInspectorPath": "pi/index.html",
+      "SupportedInMultiActions": true,
+      "Tooltip": "Simple display of the status from Contact-Item (Window)",
+      "UUID": "com.rliegmann.openhab.contact"
+    },
+    {
       "Icon": "pluginIcon", 
       "Name": "Button", 
       "States": [
@@ -57,7 +77,7 @@
   "Name": "openHAB", 
   "Icon": "pluginIcon", 
   "URL": "https://github.com/rliegmann/streamdeck-plugin-openhab", 
-  "Version": "1.1",
+  "Version": "1.2",
   "Category": "OpenHAB",
   "CategoryIcon": "pluginIcon",
   "OS": [

@@ -143,6 +143,9 @@ function MasterPI (inContext, inLanguage) {
         if (instance instanceof PI_Switch) {
             action = "com.rliegmann.openhab.switch";
         }
+        if (instance instanceof PI_Contact) {
+            action = "com.rliegmann.openhab.contact";
+        }
 
         return action;
     }
@@ -152,7 +155,7 @@ function MasterPI (inContext, inLanguage) {
         return itemSelect.options[itemSelect.selectedIndex].value;
     }
 
-    this.setSettings = function () {
+    this.setSettings = function (specificSettings) {
         var newSettings = {};
 
         var itemSelect = document.getElementById('server_select');
@@ -161,6 +164,10 @@ function MasterPI (inContext, inLanguage) {
         newSettings.openhab_item = document.getElementById('openhab_item').value;
        
         newSettings.title_template = document.getElementById("title").value;
+
+        if (specificSettings != undefined) {
+            newSettings.specificSettings = specificSettings;
+        }
 
         SendSettings(getCurrentAction(), inContext, newSettings);
     }
@@ -250,7 +257,10 @@ function MasterPI (inContext, inLanguage) {
         opt.selected = 'selected';
 
         document.getElementById('title').value = title_template;
+
+        instance.ShowSpecificSettings(data.specificSettings);
     }
+    return this;
 }
 
 function removeOptions(selectElement) {

@@ -37,6 +37,9 @@ function connectElgatoStreamDeckSocket(inPort, inUUID, inRegisterEvent, inInfo, 
     if (action === 'com.rliegmann.openhab.switch') {
         pi = new PI_Switch(inUUID, language);
     }
+    if (action === 'com.rliegmann.openhab.contact') {
+        pi = new PI_Contact(inUUID, language);
+    }
 
 
     websocket.onmessage = function (evt) {
@@ -125,4 +128,21 @@ function SetGlobalSettings(uuid) {
         };
         websocket.send(JSON.stringify(json));
     }
+}
+
+async function LoadSpecificContent(actionType) {
+    var rawFile = new XMLHttpRequest();
+        rawFile.open("GET", "pi_"+actionType+"_specific.html", false);
+        rawFile.onreadystatechange = function ()
+        {
+            if(rawFile.readyState === 4)
+            {
+                if(rawFile.status === 200 || rawFile.status == 0)
+                {
+                    var allText = rawFile.responseText;
+                    document.getElementById('specific_content').innerHTML = allText;
+                }
+            }
+        }
+        rawFile.send(null);
 }
