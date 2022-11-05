@@ -2,12 +2,18 @@ function ActionButton (inContext, inAction, inSettings, coordinates, openhabConn
     var instance = this;
     var action = inAction;    
 
+    var mode = "once";
+    var cmd1 = undefined;
+    var cmd2 = undefined;
+
     this.GetAvailableItems = function() {
         instance.GetAvailableItems("none");
     }
 
     this.SetNewSettings = async function(newSettings) {
-        console.log("Setze neue Settings in ActionContact");      
+        console.log("Setze neue Settings in ActionContact");     
+        
+        processCommands(newSettings);
 
       /*
         if (newSettings.openhab_server != instance.Settings.openhab_server ||
@@ -31,6 +37,15 @@ function ActionButton (inContext, inAction, inSettings, coordinates, openhabConn
          console.log(instance.Settings); 
     }
 
+    function processCommands(newSettings) {
+        if (newSettings.specificSettings != undefined) {
+            mode = newSettings.specificSettings.mode;
+            cmd1 = newSettings.specificSettings.cmd1;
+            cmd2 = newSettings.specificSettings.cmd2;
+        }
+
+    }
+
     this.SendSettings = function () {       
         var payload = { data: instance.Settings};				 
         payload.type = "requestSettingsResponse";
@@ -40,11 +55,14 @@ function ActionButton (inContext, inAction, inSettings, coordinates, openhabConn
 
     this.onKeyDown = function (context) {
         console.log("FIRE KEY DOWN");
-        instance.SendComandToItem("string", "123456789");
+        instance.SendComandToItem("string", cmd1);
     }
 
     this.onKeyUp = function (context) {
         console.log("FIRE KEY UP");
+        if (mode == "updown") {
+            instance.SendComandToItem("string", cmd2);
+        }
     }
 
 
@@ -55,7 +73,9 @@ function ActionButton (inContext, inAction, inSettings, coordinates, openhabConn
     if (instance.Settings.openhab_item == "---") {
         console.log("BIS Hier habe ich es geschafft");      
                
-    }    
+    }  
+    
+    processCommands(inSettings);
 
     const handleOnItemStateChanged = (data) => {
         console.log('Was fired: ', inContext,":   ", data); 
