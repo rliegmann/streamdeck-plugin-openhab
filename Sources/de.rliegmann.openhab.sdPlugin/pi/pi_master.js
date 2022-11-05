@@ -146,6 +146,9 @@ function MasterPI (inContext, inLanguage) {
         if (instance instanceof PI_Contact) {
             action = "com.rliegmann.openhab.contact";
         }
+        if (instance instanceof PI_Button) {
+            action = "com.rliegmann.openhab.button"
+        }
 
         return action;
     }
