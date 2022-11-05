@@ -50,7 +50,7 @@
           "FontSize": "16"
         }
       ], 
-      "PropertyInspectorPath": "openhabButton_PI.html",
+      "PropertyInspectorPath": "pi/index.html",
       "SupportedInMultiActions": true,
       "Tooltip": "Simple button that sends the specified property.", 
       "UUID": "com.rliegmann.openhab.button"
