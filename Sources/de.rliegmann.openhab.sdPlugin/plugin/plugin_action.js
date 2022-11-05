@@ -113,7 +113,7 @@ function Action(inAction, inContext, settings, coordinates, openhabConnector) {
 
         if (settingsCache.openhab_server === '---'  && previousSettingsCache.openhab_server === '---') {
             return;
-        }    
+        } 
 
         if ( previousSettingsCache.openhab_server = settingsCache.openhab_server && !isOpenHabInitialized ) {
             openhabServer = openhabConnector.GetServerWithUUID(settingsCache.openhab_server);
@@ -126,6 +126,10 @@ function Action(inAction, inContext, settings, coordinates, openhabConnector) {
            this.GetAvailableItems();
         }   
         else {
+            if (action == 'com.rliegmann.openhab.button') {
+                return;
+            }
+
             var state = await openhabServer.GetCurrentStatus(settingsCache.openhab_item);
             var item = {value: state.state}; // THIS is not the findale  Change this
             _currentItemState = item.value;
@@ -192,6 +196,7 @@ function Action(inAction, inContext, settings, coordinates, openhabConnector) {
     }
 
     this.SendComandToItem = function(itemType, command) {
+        /*
         var openhabItemType = ITEM_TYPE.NONE;
         switch (itemType) {
             case 'switch': openhabItemType = ITEM_TYPE.SWITCH;                
@@ -199,6 +204,7 @@ function Action(inAction, inContext, settings, coordinates, openhabConnector) {
             default:
                 return;
         }
+        */
         OpenhabConnector.SendCommandToItem(settingsCache.openhab_server, settingsCache.openhab_item, command);
     }
     
