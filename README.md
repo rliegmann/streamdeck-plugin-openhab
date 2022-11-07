@@ -28,11 +28,11 @@ Light
 ### Ready to use:
 - Lable
 - Switch
-
-
-### Next development:
 - Button (Send custom Data (String, etc.) to a Item
 - Windows Status (Show current Contact State)
+
+### Next development:
+
 - Blinds
 
 ---
