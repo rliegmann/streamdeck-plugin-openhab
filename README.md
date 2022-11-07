@@ -29,10 +29,10 @@ Light
 - Lable
 - Switch
 - Button (Send custom Data (String, etc.) to a Item
-
+- Windows Status (Show current Contact State)
 
 ### Next development:
-- Windows Status (Show current Contact State)
+
 - Blinds
 
 ---
