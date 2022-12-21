@@ -76,20 +76,19 @@ class OpenHabServer {
             signal: this.ctrl.signal,
             onmessage(e) {
                 console.log(e.data);
-                switch (e.event) {
-                    case 'alive':
-                        
-                        break;
-                    
-                    case '':
-                
-                    default:
-                        break;
-                }
-                if (e.data == `{"type":"ALIVE"}`) {
+
+                if (e.event == 'event' && e.data == `{"type":"ALIVE"}`) {
                     // Do anything with the Alive Message
                     console.log("ALIVE from OpenHAB Server :-)");
-                } else {
+                }
+                else if(e.event == 'alive') {
+                    var json = JSON.parse(e.data);
+                    if (json.type == 'ALIVE') {
+                        // Do anything with the Alive Message
+                    console.log("ALIVE from OpenHAB Server :-)");
+                    }
+                }
+                 else {
                     self.emit('ItemStatusChanged', new OpenHabItemChangedEvent(self.uuid, e.data));
                 }
             },
@@ -144,7 +143,7 @@ class OpenHabServer {
             throw new Error('Something went wrong');
             })
             .then(data => {
-               console.log(data)
+               //console.log(data)
                var obj = JSON.parse(data);
                this.version = parseOpenHabVerson(obj.runtimeInfo.version);
                console.log(this.version);  
