@@ -1,7 +1,8 @@
 class OpenHabServer {
     itemsToListen = [];
     openHabEventSource = null;
-    ctrl = new AbortController();
+    ctrl = new AbortController()
+    version = null;
     
 
     constructor(uuid, protocol, url, name, auth) {
@@ -13,6 +14,8 @@ class OpenHabServer {
 
         this._events = {};
         this.ctrl = new AbortController();
+
+        this._getServerVersion();
     }
 
     _baseURL() {
@@ -73,6 +76,16 @@ class OpenHabServer {
             signal: this.ctrl.signal,
             onmessage(e) {
                 console.log(e.data);
+                switch (e.event) {
+                    case 'alive':
+                        
+                        break;
+                    
+                    case '':
+                
+                    default:
+                        break;
+                }
                 if (e.data == `{"type":"ALIVE"}`) {
                     // Do anything with the Alive Message
                     console.log("ALIVE from OpenHAB Server :-)");
@@ -117,6 +130,28 @@ class OpenHabServer {
                 break;            
         }
         return options;
+    }
+
+    _getServerVersion() {
+        var queryURL = this._baseURL();
+
+        var options = this._buildConnectionOptions();
+
+        fetch(queryURL, options).then((response) => {
+            if (response.ok) {
+                return response.text();
+            }
+            throw new Error('Something went wrong');
+            })
+            .then(data => {
+               console.log(data)
+               var obj = JSON.parse(data);
+               this.version = parseOpenHabVerson(obj.runtimeInfo.version);
+               console.log(this.version);  
+            })
+            .catch((error) => {
+                console.log('Error: ' , error);
+            });
     }
 
     GetAvailableItems(uuid, itemType = ITEM_TYPE) {
