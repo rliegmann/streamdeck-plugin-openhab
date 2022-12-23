@@ -1,7 +1,8 @@
 class OpenHabServer {
     itemsToListen = [];
     openHabEventSource = null;
-    ctrl = new AbortController();
+    ctrl = new AbortController()
+    version = null;
     
 
     constructor(uuid, protocol, url, name, auth) {
@@ -13,6 +14,8 @@ class OpenHabServer {
 
         this._events = {};
         this.ctrl = new AbortController();
+
+        this._getServerVersion();
     }
 
     _baseURL() {
@@ -73,10 +76,19 @@ class OpenHabServer {
             signal: this.ctrl.signal,
             onmessage(e) {
                 console.log(e.data);
-                if (e.data == `{"type":"ALIVE"}`) {
+
+                if (e.event == 'event' && e.data == `{"type":"ALIVE"}`) {
                     // Do anything with the Alive Message
                     console.log("ALIVE from OpenHAB Server :-)");
-                } else {
+                }
+                else if(e.event == 'alive') {
+                    var json = JSON.parse(e.data);
+                    if (json.type == 'ALIVE') {
+                        // Do anything with the Alive Message
+                    console.log("ALIVE from OpenHAB Server :-)");
+                    }
+                }
+                 else {
                     self.emit('ItemStatusChanged', new OpenHabItemChangedEvent(self.uuid, e.data));
                 }
             },
@@ -117,6 +129,28 @@ class OpenHabServer {
                 break;            
         }
         return options;
+    }
+
+    _getServerVersion() {
+        var queryURL = this._baseURL();
+
+        var options = this._buildConnectionOptions();
+
+        fetch(queryURL, options).then((response) => {
+            if (response.ok) {
+                return response.text();
+            }
+            throw new Error('Something went wrong');
+            })
+            .then(data => {
+               //console.log(data)
+               var obj = JSON.parse(data);
+               this.version = parseOpenHabVerson(obj.runtimeInfo.version);
+               console.log(this.version);  
+            })
+            .catch((error) => {
+                console.log('Error: ' , error);
+            });
     }
 
     GetAvailableItems(uuid, itemType = ITEM_TYPE) {
